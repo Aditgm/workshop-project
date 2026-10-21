@@ -1,0 +1,114 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id               String             @id @default(cuid())
+  name             String
+  email            String             @unique
+  passwordHash     String
+  role             String             @default("USER")
+  createdAt        DateTime           @default(now())
+  sessions         Session[]
+  purchases        WorkshopPurchase[]
+  notificationReads NotificationRead[]
+
+  @@index([role])
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  tokenHash String   @unique
+  userId    String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model Workshop {
+  id                 String             @id @default(cuid())
+  slug               String             @unique
+  title              String
+  summary            String
+  description        String
+  type               String             @default("PUBLIC")
+  priceCents         Int                @default(0)
+  currency           String             @default("usd")
+  startsAt           DateTime
+  endsAt             DateTime?
+  location           String?
+  meetingUrl         String
+  capacity           Int?
+  coverImageUrl      String?
+  published          Boolean            @default(false)
+  notificationSentAt DateTime?
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+  purchases          WorkshopPurchase[]
+  notifications      Notification[]
+
+  @@index([published, startsAt])
+  @@index([type])
+}
+
+model WorkshopPurchase {
+  id                    String   @id @default(cuid())
+  userId                String
+  workshopId            String
+  status                String   @default("PENDING")
+  amountCents           Int
+  currency              String   @default("usd")
+  stripeSessionId       String?  @unique
+  stripePaymentIntentId String?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+  paidAt                DateTime?
+  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workshop              Workshop @relation(fields: [workshopId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, workshopId])
+  @@index([status])
+  @@index([workshopId])
+  @@index([stripePaymentIntentId])
+}
+
+model Notification {
+  id           String             @id @default(cuid())
+  title        String
+  message      String
+  workshopId   String?
+  createdAt    DateTime           @default(now())
+  workshop     Workshop?          @relation(fields: [workshopId], references: [id], onDelete: SetNull)
+  reads        NotificationRead[]
+
+  @@index([createdAt])
+}
+
+model NotificationRead {
+  id             String       @id @default(cuid())
+  notificationId String
+  userId         String
+  readAt         DateTime     @default(now())
+  notification   Notification @relation(fields: [notificationId], references: [id], onDelete: Cascade)
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([notificationId, userId])
+  @@index([userId])
+}
+
+model RateLimitAttempt {
+  id        String   @id @default(cuid())
+  key       String
+  createdAt DateTime @default(now())
+
+  @@index([key, createdAt])
+  @@index([createdAt])
+}
