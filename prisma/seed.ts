@@ -10,41 +10,57 @@ function daysFromNow(days: number, hour = 18) {
   return date;
 }
 
+async function findOrCreateUser(input: {
+  email: string;
+  password: string;
+  name: string;
+  role: "ADMIN" | "USER";
+}) {
+  const existing = await prisma.user.findUnique({
+    where: { email: input.email },
+  });
+
+  if (existing) return existing;
+
+  return prisma.user.create({
+    data: {
+      name: input.name,
+      email: input.email,
+      passwordHash: await hash(input.password, 12),
+      role: input.role,
+    },
+  });
+}
+
 async function main() {
-  const adminEmail = (process.env.SEED_ADMIN_EMAIL ?? "admin@example.com").toLowerCase();
-  const adminPassword = process.env.SEED_ADMIN_PASSWORD ?? "Admin123!";
-  const memberEmail = (process.env.SEED_MEMBER_EMAIL ?? "member@example.com").toLowerCase();
-  const memberPassword = process.env.SEED_MEMBER_PASSWORD ?? "Member123!";
+  const adminEmail = process.env.SEED_ADMIN_EMAIL?.trim().toLowerCase();
+  const adminPassword = process.env.SEED_ADMIN_PASSWORD;
 
-  const admin = await prisma.user.upsert({
-    where: { email: adminEmail },
-    update: {
-      name: "Workshop Admin",
-      passwordHash: await hash(adminPassword, 12),
-      role: "ADMIN",
-    },
-    create: {
-      name: "Workshop Admin",
-      email: adminEmail,
-      passwordHash: await hash(adminPassword, 12),
-      role: "ADMIN",
-    },
+  if (!adminEmail || !adminPassword) {
+    throw new Error(
+      "SEED_ADMIN_EMAIL and SEED_ADMIN_PASSWORD are required to seed the database.",
+    );
+  }
+
+  const memberEmail = process.env.SEED_MEMBER_EMAIL?.trim().toLowerCase();
+  const memberPassword = process.env.SEED_MEMBER_PASSWORD;
+
+  const admin = await findOrCreateUser({
+    email: adminEmail,
+    password: adminPassword,
+    name: "Workshop Admin",
+    role: "ADMIN",
   });
 
-  const member = await prisma.user.upsert({
-    where: { email: memberEmail },
-    update: {
-      name: "Sample Member",
-      passwordHash: await hash(memberPassword, 12),
-      role: "USER",
-    },
-    create: {
-      name: "Sample Member",
-      email: memberEmail,
-      passwordHash: await hash(memberPassword, 12),
-      role: "USER",
-    },
-  });
+  const member =
+    memberEmail && memberPassword
+      ? await findOrCreateUser({
+          email: memberEmail,
+          password: memberPassword,
+          name: "Sample Member",
+          role: "USER",
+        })
+      : null;
 
   const publicWorkshop = await prisma.workshop.upsert({
     where: { slug: "intro-to-system-design" },
@@ -105,8 +121,8 @@ async function main() {
   }
 
   console.log("Seed complete.");
-  console.log(`Admin:  ${admin.email} / ${adminPassword}`);
-  console.log(`Member: ${member.email} / ${memberPassword}`);
+  console.log(`Admin: ${admin.email}`);
+  if (member) console.log(`Member: ${member.email}`);
 }
 
 main()

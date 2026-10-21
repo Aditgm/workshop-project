@@ -7,9 +7,25 @@ on:
 jobs:
   verify:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: workshop
+          POSTGRES_PASSWORD: workshop
+          POSTGRES_DB: workshop_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U workshop -d workshop_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
     env:
-      DATABASE_URL: file:./ci.db
+      DATABASE_URL: postgresql://workshop:workshop@localhost:5432/workshop_test?schema=public
       SITE_URL: http://localhost:3000
+      SEED_ADMIN_EMAIL: admin@example.com
+      SEED_ADMIN_PASSWORD: test-admin-password
 
     steps:
       - uses: actions/checkout@v4
@@ -22,6 +38,8 @@ jobs:
       - run: npm ci
 
       - run: npx prisma migrate deploy
+
+      - run: npm run db:seed
 
       - run: npm run lint
 

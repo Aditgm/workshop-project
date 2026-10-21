@@ -1,36 +1,67 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Workshop Hub
 
-## Getting Started
+A Next.js workshop platform with public workshop pages, member accounts, paid enrollment, notifications, and an admin panel.
 
-First, run the development server:
+## Local development
+
+Requirements:
+
+- Node.js 20.9 or newer
+- Docker Desktop (for the local Postgres database)
 
 ```bash
+copy .env.example .env
+docker compose up -d
+npm install
+npm run db:deploy
+npm run db:seed
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Fill in `SEED_ADMIN_EMAIL` and `SEED_ADMIN_PASSWORD` in `.env` before running `npm run db:seed`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Open [http://localhost:3000](http://localhost:3000).
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+The app uses PostgreSQL in every environment. The old SQLite `prisma/dev.db` is no longer used.
 
-## Learn More
+## Environment variables
 
-To learn more about Next.js, take a look at the following resources:
+| Variable | Required | Purpose |
+| --- | --- | --- |
+| `DATABASE_URL` | Yes | PostgreSQL connection string |
+| `SITE_URL` | Yes | Public app URL used by checkout redirects |
+| `SEED_ADMIN_EMAIL` | Seed only | Initial administrator email |
+| `SEED_ADMIN_PASSWORD` | Seed only | Initial administrator password |
+| `SEED_MEMBER_EMAIL` | No | Optional sample member email |
+| `SEED_MEMBER_PASSWORD` | No | Optional sample member password |
+| `STRIPE_SECRET_KEY` | No | Enables real Stripe Checkout |
+| `STRIPE_WEBHOOK_SECRET` | No | Verifies Stripe webhook requests |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Deploying to Vercel
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1. Create a PostgreSQL database with Neon, Supabase, or the Vercel Marketplace.
+2. In Vercel, open **Project Settings → Environment Variables** and add:
+   - `DATABASE_URL`: the direct (non-pooled) PostgreSQL connection string.
+   - `SITE_URL`: your production URL, for example `https://your-project.vercel.app`.
+   - `SEED_ADMIN_EMAIL` and `SEED_ADMIN_PASSWORD`: the first admin account.
+   - Optional: `SEED_MEMBER_EMAIL`, `SEED_MEMBER_PASSWORD`, and Stripe variables.
+3. Redeploy the project.
 
-## Deploy on Vercel
+Vercel uses the `vercel-build` script, which applies Prisma migrations, seeds any missing baseline data, and builds the app. Existing users and workshops are not overwritten by later deploys.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+For Stripe, set the webhook endpoint to `https://your-domain/api/stripe/webhook` and add the signing secret as `STRIPE_WEBHOOK_SECRET`.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Scripts
+
+```bash
+npm run dev          # Start the development server
+npm run build        # Production build
+npm run start        # Start the production server
+npm run lint         # Run ESLint
+npm run typecheck    # Run TypeScript checks
+npm test             # Run unit tests
+npm run db:migrate   # Create and apply a development migration
+npm run db:deploy    # Apply committed migrations
+npm run db:seed      # Seed missing baseline users and workshops
+npm run db:studio    # Open Prisma Studio
+```
