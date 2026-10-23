@@ -1,139 +1,177 @@
 import Link from "next/link";
 import { logoutAction } from "@/actions/auth";
 import { getSessionUser } from "@/lib/auth";
-import { initials } from "@/lib/format";
-import { getUnreadNotificationCount } from "@/lib/notifications";
-import { primaryButton, subtleButton } from "@/components/ui";
+import { BrandMark } from "@/components/marketing/brand-mark";
+import {
+  Container,
+  primaryButton,
+} from "@/components/marketing/marketing-ui";
+
+const primaryLinks = [
+  { href: "/programs", label: "Programs" },
+  { href: "/for-companies", label: "For Companies" },
+  { href: "/resources", label: "Resources" },
+];
+
+const utilityLinks = [
+  { href: "/rinassa-ai", label: "Rinassa AI" },
+  { href: "/about", label: "About Us" },
+  { href: "/contact", label: "Contact Us" },
+];
 
 export async function SiteHeader() {
   const user = await getSessionUser();
-  const unread = user
-    ? await getUnreadNotificationCount(user.id, user.createdAt)
-    : 0;
-
-  const navLinks = (
-    <>
-      <Link href="/" className={`${subtleButton} text-[13px]`}>
-        Workshops
-      </Link>
-      {user ? (
-        <Link href="/dashboard" className={`${subtleButton} text-[13px]`}>
-          Dashboard
-        </Link>
-      ) : null}
-      {user?.role === "ADMIN" ? (
-        <Link href="/admin" className={`${subtleButton} text-[13px]`}>
-          Admin
-        </Link>
-      ) : null}
-    </>
-  );
+  const portalHref = user?.role === "ADMIN" ? "/admin" : "/login";
+  const portalLabel = user?.role === "ADMIN" ? "Admin" : "Login";
 
   return (
-    <header className="sticky top-0 z-50 px-3 pt-3 sm:px-5 sm:pt-5">
-      <div className="site-nav-shell mx-auto max-w-[1280px] rounded-[26px] px-3 py-2 sm:rounded-full sm:px-4">
-        <div className="flex items-center gap-2">
-          <Link
-            href="/"
-            className="group flex shrink-0 items-center gap-2.5 rounded-full pr-2"
-            aria-label="Workshop Hub home"
+    <>
+      <div className="bg-navy text-cream/65">
+        <Container className="flex min-h-9 items-center justify-between gap-6 py-2">
+          <p className="hidden text-[10px] font-medium uppercase tracking-[0.18em] sm:block">
+            Practical commercial education, advisory, and community.
+          </p>
+          <nav
+            aria-label="Utility navigation"
+            className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[10px] font-medium uppercase tracking-[0.16em] sm:ml-auto"
           >
-            <span className="relative grid size-9 place-items-center overflow-hidden rounded-full border border-white/20 bg-gradient-to-br from-white via-zinc-200 to-zinc-500 text-zinc-950 shadow-[0_0_24px_rgba(196,181,253,0.18)] transition-transform duration-300 group-hover:-rotate-6 motion-reduce:transform-none">
-              <span className="text-[11px] font-bold tracking-[-0.08em]">WH</span>
-            </span>
-            <span className="hidden text-sm font-medium tracking-[-0.025em] text-white sm:inline">
-              Workshop Hub
-            </span>
-          </Link>
+            {utilityLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="transition-colors hover:text-gold-soft"
+              >
+                {link.label}
+              </Link>
+            ))}
+            <span aria-hidden="true" className="hidden h-3 w-px bg-cream/20 sm:block" />
+            <Link
+              href={portalHref}
+              className="transition-colors hover:text-gold-soft"
+            >
+              {portalLabel}
+            </Link>
+            {user ? (
+              <form action={logoutAction} className="contents">
+                <button
+                  type="submit"
+                  className="uppercase tracking-[0.16em] transition-colors hover:text-gold-soft"
+                >
+                  Sign out
+                </button>
+              </form>
+            ) : null}
+          </nav>
+        </Container>
+      </div>
 
-          <nav className="mx-auto hidden items-center gap-0.5 lg:flex">
-            {navLinks}
+      <header className="sticky top-0 z-50 border-b border-navy/10 bg-cream/95 backdrop-blur">
+        <Container className="relative flex h-[76px] items-center justify-between gap-8">
+          <BrandMark />
+
+          <nav
+            aria-label="Primary navigation"
+            className="hidden items-center gap-8 lg:flex"
+          >
+            {primaryLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="text-[12px] font-semibold uppercase tracking-[0.16em] text-navy/70 transition-colors hover:text-gold"
+              >
+                {link.label}
+              </Link>
+            ))}
           </nav>
 
-          <div className="ml-auto flex items-center gap-1.5 sm:ml-0">
-            {user ? (
-              <>
-                <Link
-                  href="/dashboard#notifications"
-                  className="group relative inline-flex size-9 items-center justify-center rounded-full text-white/55 transition-colors hover:bg-white/[0.055] hover:text-white"
-                  aria-label={`Notifications${unread ? `, ${unread} unread` : ""}`}
-                >
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.6"
-                    className="size-[18px] transition-transform duration-200 ease-out group-hover:-rotate-6 motion-reduce:transform-none"
-                    aria-hidden="true"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.084 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0"
-                    />
-                  </svg>
-                  {unread > 0 ? (
-                    <span className="absolute right-0 top-0 grid min-w-4 place-items-center rounded-full bg-violet-300 px-1 text-[9px] font-bold leading-4 text-zinc-950 ring-2 ring-black">
-                      {unread > 9 ? "9+" : unread}
-                    </span>
-                  ) : null}
-                </Link>
-
-                <Link
-                  href="/account"
-                  aria-label={`Account settings for ${user.name}`}
-                  className="flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.035] py-1 pl-1 pr-2.5 text-sm font-medium text-white/75 transition-[transform,border-color,background-color] duration-200 ease-out hover:-translate-y-px hover:border-white/20 hover:bg-white/[0.06] motion-reduce:transform-none"
-                >
-                  <span className="grid size-7 place-items-center rounded-full bg-gradient-to-br from-violet-200 to-white text-[10px] font-bold text-zinc-950">
-                    {initials(user.name)}
-                  </span>
-                  <span className="hidden max-w-28 truncate sm:inline">{user.name}</span>
-                </Link>
-
-                <form action={logoutAction} className="hidden md:block">
-                  <button type="submit" className={`${subtleButton} text-[13px]`}>
-                    Sign out
-                  </button>
-                </form>
-              </>
-            ) : (
-              <>
-                <span className="hidden sm:block">
-                  <Link href="/login" className={`${subtleButton} text-[13px]`}>
-                    Log in
-                  </Link>
-                </span>
-                <Link href="/register" className={`${primaryButton} px-4 py-2`}>
-                  <span className="sm:hidden">Join</span>
-                  <span className="hidden sm:inline">Create account</span>
-                  <span className="grid size-5 place-items-center rounded-full bg-zinc-950 text-[10px] text-white">
-                    <span aria-hidden="true">&#8599;</span>
-                  </span>
-                </Link>
-              </>
-            )}
-          </div>
-        </div>
-
-        <div className="mt-2 flex items-center gap-0.5 overflow-x-auto border-t border-white/[0.06] px-0.5 pt-2 lg:hidden">
-          {navLinks}
-          {user ? (
-            <form action={logoutAction} className="ml-auto md:hidden">
-              <button type="submit" className={`${subtleButton} whitespace-nowrap text-[13px]`}>
-                Sign out
-              </button>
-            </form>
-          ) : (
-            <Link
-              href="/login"
-              className={`${subtleButton} ml-auto whitespace-nowrap text-[13px] sm:hidden`}
-            >
-              Log in
+          <div className="flex items-center gap-3">
+            <Link href="/apply" className={`${primaryButton} hidden px-4 py-2.5 sm:inline-flex`}>
+              Apply Now
+              <span aria-hidden="true">&#8599;</span>
             </Link>
-          )}
-        </div>
-        <span className="site-nav-sheen" aria-hidden="true" />
-      </div>
-    </header>
+
+            <details className="group relative lg:hidden">
+              <summary
+                className="flex size-11 cursor-pointer list-none items-center justify-center border border-navy/20 text-navy transition-colors hover:border-navy/45 [&::-webkit-details-marker]:hidden"
+                aria-label="Open navigation menu"
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  className="size-5 group-open:hidden"
+                  aria-hidden="true"
+                >
+                  <path strokeLinecap="round" d="M4 7h16M4 12h16M4 17h16" />
+                </svg>
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  className="hidden size-5 group-open:block"
+                  aria-hidden="true"
+                >
+                  <path strokeLinecap="round" d="m6 6 12 12M18 6 6 18" />
+                </svg>
+              </summary>
+
+              <nav
+                aria-label="Mobile navigation"
+                className="absolute right-0 top-[calc(100%+14px)] z-50 w-[min(22rem,calc(100vw-2.5rem))] border border-navy/15 bg-cream p-5 shadow-[0_24px_60px_rgba(10,35,56,0.18)]"
+              >
+                <div className="grid gap-1">
+                  {primaryLinks.map((link) => (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      className="border-b border-navy/10 py-3 font-display text-2xl text-navy transition-colors hover:text-gold"
+                    >
+                      {link.label}
+                    </Link>
+                  ))}
+                  <Link
+                    href="/apply"
+                    className={`${primaryButton} mt-4 w-full`}
+                  >
+                    Apply Now
+                    <span aria-hidden="true">&#8599;</span>
+                  </Link>
+                </div>
+
+                <div className="mt-5 grid gap-2 border-t border-navy/10 pt-4 text-[11px] font-semibold uppercase tracking-[0.16em] text-navy/60">
+                  {utilityLinks.map((link) => (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      className="py-1 transition-colors hover:text-gold"
+                    >
+                      {link.label}
+                    </Link>
+                  ))}
+                  <Link
+                    href={portalHref}
+                    className="py-1 transition-colors hover:text-gold"
+                  >
+                    {portalLabel}
+                  </Link>
+                  {user ? (
+                    <form action={logoutAction}>
+                      <button
+                        type="submit"
+                        className="py-1 uppercase tracking-[0.16em] transition-colors hover:text-gold"
+                      >
+                        Sign out
+                      </button>
+                    </form>
+                  ) : null}
+                </div>
+              </nav>
+            </details>
+          </div>
+        </Container>
+      </header>
+    </>
   );
 }

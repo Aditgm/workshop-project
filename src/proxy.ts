@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-const SESSION_COOKIE = "workshop_session";
+const SESSION_COOKIE = "hnf_session";
 
 export function proxy(request: NextRequest) {
   if (request.cookies.has(SESSION_COOKIE)) {
@@ -18,10 +18,5 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    "/admin/:path*",
-    "/dashboard/:path*",
-    "/account/:path*",
-    "/checkout/:path*",
-  ],
+  matcher: ["/admin/:path*"],
 };

@@ -8,15 +8,13 @@ datasource db {
 }
 
 model User {
-  id               String             @id @default(cuid())
-  name             String
-  email            String             @unique
-  passwordHash     String
-  role             String             @default("USER")
-  createdAt        DateTime           @default(now())
-  sessions         Session[]
-  purchases        WorkshopPurchase[]
-  notificationReads NotificationRead[]
+  id           String    @id @default(cuid())
+  name         String
+  email        String    @unique
+  passwordHash String
+  role         String    @default("USER")
+  createdAt    DateTime  @default(now())
+  sessions     Session[]
 
   @@index([role])
 }
@@ -33,77 +31,6 @@ model Session {
   @@index([expiresAt])
 }
 
-model Workshop {
-  id                 String             @id @default(cuid())
-  slug               String             @unique
-  title              String
-  summary            String
-  description        String
-  type               String             @default("PUBLIC")
-  priceCents         Int                @default(0)
-  currency           String             @default("usd")
-  startsAt           DateTime
-  endsAt             DateTime?
-  location           String?
-  meetingUrl         String
-  capacity           Int?
-  coverImageUrl      String?
-  published          Boolean            @default(false)
-  notificationSentAt DateTime?
-  createdAt          DateTime           @default(now())
-  updatedAt          DateTime           @updatedAt
-  purchases          WorkshopPurchase[]
-  notifications      Notification[]
-
-  @@index([published, startsAt])
-  @@index([type])
-}
-
-model WorkshopPurchase {
-  id                    String   @id @default(cuid())
-  userId                String
-  workshopId            String
-  status                String   @default("PENDING")
-  amountCents           Int
-  currency              String   @default("usd")
-  stripeSessionId       String?  @unique
-  stripePaymentIntentId String?
-  createdAt             DateTime @default(now())
-  updatedAt             DateTime @updatedAt
-  paidAt                DateTime?
-  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  workshop              Workshop @relation(fields: [workshopId], references: [id], onDelete: Cascade)
-
-  @@unique([userId, workshopId])
-  @@index([status])
-  @@index([workshopId])
-  @@index([stripePaymentIntentId])
-}
-
-model Notification {
-  id           String             @id @default(cuid())
-  title        String
-  message      String
-  workshopId   String?
-  createdAt    DateTime           @default(now())
-  workshop     Workshop?          @relation(fields: [workshopId], references: [id], onDelete: SetNull)
-  reads        NotificationRead[]
-
-  @@index([createdAt])
-}
-
-model NotificationRead {
-  id             String       @id @default(cuid())
-  notificationId String
-  userId         String
-  readAt         DateTime     @default(now())
-  notification   Notification @relation(fields: [notificationId], references: [id], onDelete: Cascade)
-  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([notificationId, userId])
-  @@index([userId])
-}
-
 model RateLimitAttempt {
   id        String   @id @default(cuid())
   key       String
@@ -111,4 +38,57 @@ model RateLimitAttempt {
 
   @@index([key, createdAt])
   @@index([createdAt])
+}
+
+model SiteSetting {
+  key       String   @id
+  value     Json
+  updatedAt DateTime @updatedAt
+}
+
+model Application {
+  id           String   @id @default(cuid())
+  fullName     String
+  email        String
+  phone        String?
+  currentRole  String?
+  company      String?
+  experience   String?
+  linkedinUrl  String?
+  motivation   String
+  consentAt    DateTime @default(now())
+  status       String   @default("NEW")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([status, createdAt])
+  @@index([email])
+}
+
+model ContactEnquiry {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  company   String?
+  topic     String
+  message   String
+  status    String   @default("NEW")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status, createdAt])
+  @@index([email])
+}
+
+model RevenueLabRegistration {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  role      String?
+  company   String?
+  status    String   @default("REGISTERED")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status, createdAt])
 }

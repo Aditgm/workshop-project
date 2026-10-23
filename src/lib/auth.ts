@@ -4,7 +4,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 
-const SESSION_COOKIE = "workshop_session";
+const SESSION_COOKIE = "hnf_session";
 const SESSION_TTL_SECONDS = 60 * 60 * 24 * 7;
 
 export type SessionUser = {
@@ -109,18 +109,7 @@ export function loginUrl(nextPath?: string): string {
   return `/login?next=${encodeURIComponent(nextPath)}`;
 }
 
-export function safeRedirectPath(
-  value: unknown,
-  fallback = "/dashboard",
-): string {
-  if (typeof value !== "string") return fallback;
-  if (!value.startsWith("/") || value.startsWith("//") || value.startsWith("/\\")) {
-    return fallback;
-  }
-  return value;
-}
-
-export async function requireUser(nextPath = "/dashboard"): Promise<SessionUser> {
+export async function requireUser(nextPath = "/"): Promise<SessionUser> {
   const user = await getSessionUser();
   if (!user) redirect(loginUrl(nextPath));
   return user;
@@ -129,6 +118,6 @@ export async function requireUser(nextPath = "/dashboard"): Promise<SessionUser>
 export async function requireAdmin(): Promise<SessionUser> {
   const user = await getSessionUser();
   if (!user) redirect(loginUrl("/admin"));
-  if (user.role !== "ADMIN") redirect("/dashboard?error=forbidden");
+  if (user.role !== "ADMIN") redirect("/");
   return user;
 }

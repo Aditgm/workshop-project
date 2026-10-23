@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { primaryButton } from "@/components/ui";
+import { BrandMark } from "@/components/marketing/brand-mark";
 
 export default function ErrorPage({
   reset,
@@ -10,28 +10,36 @@ export default function ErrorPage({
   reset: () => void;
 }) {
   return (
-    <div className="mx-auto flex max-w-xl flex-col items-center px-5 py-28 text-center sm:px-8">
-      <span className="grid size-12 place-items-center rounded-full border border-rose-300/20 bg-rose-400/[0.07] text-rose-200">
-        <span className="text-lg" aria-hidden="true">
-          !
-        </span>
-      </span>
-      <p className="mt-6 text-[11px] font-medium uppercase tracking-[0.22em] text-rose-200/60">
-        Something went wrong
-      </p>
-      <h1 className="mt-3 text-4xl font-semibold tracking-[-0.05em] text-white">
-        We could not load this page.
-      </h1>
-      <p className="mt-4 text-sm leading-6 text-white/40">
-        Try again in a moment. If the problem continues, contact the organizer.
-      </p>
-      <div className="mt-7 flex flex-wrap items-center justify-center gap-4">
-        <button type="button" onClick={reset} className={primaryButton}>
-          Try again
-        </button>
-        <Link href="/" className="text-sm font-medium text-white/40 hover:text-white">
-          Back to workshops
-        </Link>
+    <div className="flex min-h-dvh flex-col bg-cream">
+      <div className="mx-auto w-full max-w-[1280px] px-5 py-6 sm:px-8">
+        <BrandMark />
+      </div>
+      <div className="mx-auto flex w-full max-w-xl flex-1 flex-col items-start justify-center px-5 py-20 sm:px-8">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.26em] text-gold">
+          Something went wrong
+        </p>
+        <h1 className="mt-5 font-display text-5xl leading-[0.98] tracking-[-0.035em] text-navy sm:text-6xl">
+          We could not load this page.
+        </h1>
+        <p className="mt-5 max-w-md text-sm leading-6 text-ink/60">
+          Try again in a moment. If the problem continues, use the contact page
+          and the team will follow up.
+        </p>
+        <div className="mt-8 flex flex-wrap gap-3">
+          <button
+            type="button"
+            onClick={reset}
+            className="inline-flex min-h-11 items-center justify-center border border-navy bg-navy px-5 py-3 text-sm font-semibold text-cream transition-colors hover:bg-navy-deep"
+          >
+            Try again
+          </button>
+          <Link
+            href="/contact"
+            className="inline-flex min-h-11 items-center justify-center border border-navy/20 px-5 py-3 text-sm font-semibold text-navy transition-colors hover:border-navy/40"
+          >
+            Contact us
+          </Link>
+        </div>
       </div>
     </div>
   );

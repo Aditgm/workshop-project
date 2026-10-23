@@ -1,43 +1,57 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import type { Metadata, Viewport } from "next";
+import { Manrope, Newsreader } from "next/font/google";
+import type { ReactNode } from "react";
 import "./globals.css";
-import { SiteHeader } from "@/components/site-header";
-import { SiteFooter } from "@/components/site-footer";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const manrope = Manrope({
+  variable: "--font-manrope",
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const newsreader = Newsreader({
+  variable: "--font-newsreader",
   subsets: ["latin"],
+  style: ["normal", "italic"],
 });
+
+const siteUrl = process.env.SITE_URL?.trim() || "http://localhost:3000";
 
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
   title: {
-    default: "Workshop Hub",
-    template: "%s | Workshop Hub",
+    default: "Hunt n Farm | Commercial education, advisory and community",
+    template: "%s | Hunt n Farm",
   },
   description:
-    "Discover free community workshops and enroll in premium, small-group sessions.",
+    "Hunt n Farm brings together First Quota, a six-week tech-sales academy, practical go-to-market advisory for companies, and Revenue Lab, a free weekly community.",
+  applicationName: "Hunt n Farm",
+  openGraph: {
+    type: "website",
+    siteName: "Hunt n Farm",
+    title: "Hunt n Farm | Commercial education, advisory and community",
+    description:
+      "Practical commercial education, go-to-market advisory, and a community for people doing the work.",
+    url: siteUrl,
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export const viewport: Viewport = {
+  themeColor: "#0a2338",
+  colorScheme: "light",
+};
+
+export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html
       lang="en"
       data-scroll-behavior="smooth"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${manrope.variable} ${newsreader.variable} h-full antialiased`}
     >
-      <body className="min-h-full bg-[#010101]">
-        <div className="site-backdrop" aria-hidden="true" />
-        <div className="relative z-10 flex min-h-dvh flex-col">
-          <SiteHeader />
-          <main className="flex-1">{children}</main>
-          <SiteFooter />
-        </div>
-      </body>
+      <body className="min-h-full bg-cream text-ink">{children}</body>
     </html>
   );
 }
