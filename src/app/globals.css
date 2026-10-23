@@ -151,6 +151,29 @@ select option {
   }
 }
 
+@keyframes hero-drift {
+  0% {
+    transform: scale(1.06) translate3d(0, 0, 0);
+  }
+  100% {
+    transform: scale(1.13) translate3d(-1.6%, -1.2%, 0);
+  }
+}
+
+.hero-kenburns {
+  transform-origin: 64% 50%;
+  animation: hero-drift 26s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-kenburns {
+    animation: none;
+    transform: none;
+    will-change: auto;
+  }
+}
+
 .animate-enter {
   animation: enter-up 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }

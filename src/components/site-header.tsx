@@ -85,10 +85,12 @@ export async function SiteHeader() {
           </nav>
 
           <div className="flex items-center gap-3">
-            <Link href="/apply" className={`${primaryButton} hidden px-4 py-2.5 sm:inline-flex`}>
-              Apply Now
-              <span aria-hidden="true">&#8599;</span>
-            </Link>
+            <div className="hidden sm:block">
+              <Link href="/apply" className={`${primaryButton} px-4 py-2.5`}>
+                Apply Now
+                <span aria-hidden="true">&#8599;</span>
+              </Link>
+            </div>
 
             <details className="group relative lg:hidden">
               <summary

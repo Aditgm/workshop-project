@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
+import heroCity from "@/assets/hero-city.jpg";
 import { getSiteContent } from "@/lib/site-content";
 import {
   ArrowLink,
@@ -10,14 +12,11 @@ import {
   NumberedRow,
   Rule,
   SectionLabel,
-  marketingBody,
-  marketingDisplay,
   marketingEyebrow,
   marketingSection,
   marketingSectionTitle,
   primaryButton,
   primaryButtonOnDark,
-  secondaryButton,
   secondaryButtonOnDark,
 } from "@/components/marketing/marketing-ui";
 
@@ -62,88 +61,72 @@ export default async function HomePage() {
 
   return (
     <>
-      <section className="relative overflow-hidden border-b border-navy/10">
-        <Container className="relative grid gap-12 py-16 sm:py-24 lg:grid-cols-[1.15fr_0.85fr] lg:gap-16 lg:py-28">
-          <div className="flex flex-col justify-between">
-            <div>
-              <SectionLabel index="01">Hunt n Farm</SectionLabel>
-              <h1 className={`${marketingDisplay} mt-7 max-w-4xl`}>
-                {content.home.title}
-              </h1>
-              <p className={`${marketingBody} mt-8 max-w-2xl`}>
-                {content.home.intro}
-              </p>
-              <div className="mt-10 flex flex-col gap-3 sm:flex-row">
-                <Link href="/apply" className={primaryButton}>
-                  Apply to First Quota
-                  <ArrowUpRight />
-                </Link>
-                <Link href="/programs" className={secondaryButton}>
-                  Explore programmes
-                </Link>
-              </div>
+      <section className="relative isolate overflow-hidden border-b border-navy/10 bg-navy text-cream">
+        <Image
+          src={heroCity}
+          alt=""
+          fill
+          priority
+          placeholder="blur"
+          quality={90}
+          sizes="100vw"
+          className="hero-kenburns object-cover object-[68%_center] lg:object-center"
+        />
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 bg-[linear-gradient(90deg,rgba(4,16,28,0.96)_0%,rgba(5,20,34,0.82)_38%,rgba(5,20,34,0.3)_66%,rgba(5,20,34,0.52)_100%)]"
+        />
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 bg-[linear-gradient(180deg,rgba(4,16,28,0.7)_0%,rgba(4,16,28,0.06)_32%,rgba(4,16,28,0.1)_62%,rgba(4,16,28,0.92)_100%)]"
+        />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -right-40 -top-44 size-[42rem] rounded-full border border-gold/10"
+        />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -right-8 top-16 size-[24rem] rounded-full border border-gold/[0.07]"
+        />
+
+        <Container className="relative flex min-h-[38rem] flex-col justify-center py-20 sm:min-h-[43rem] sm:py-24 lg:min-h-[46rem]">
+          <div className="max-w-3xl">
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-gold-soft">
+              <span className="text-cream/35">01</span>
+              <span
+                aria-hidden="true"
+                className="h-px w-7 bg-gold-soft/60"
+              />
+              <span>{content.home.kicker}</span>
+            </div>
+            <h1 className="mt-7 max-w-4xl text-balance font-display text-5xl leading-[0.96] tracking-[-0.04em] text-cream sm:text-6xl lg:text-7xl">
+              {content.home.title}
+            </h1>
+            <p className="mt-7 max-w-2xl text-base leading-7 text-cream/65 sm:text-lg sm:leading-8">
+              {content.home.intro}
+            </p>
+            <div className="mt-10 flex flex-col gap-3 sm:flex-row">
+              <Link href="/apply" className={primaryButtonOnDark}>
+                Apply to First Quota
+                <ArrowUpRight />
+              </Link>
+              <Link href="/programs" className={secondaryButtonOnDark}>
+                Explore programmes
+              </Link>
             </div>
 
-            <div className="mt-16 grid gap-4 border-t border-navy/15 pt-6 sm:grid-cols-3">
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-navy/55">
+            <div className="mt-16 grid max-w-2xl gap-4 border-t border-cream/20 pt-6 sm:grid-cols-3">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-cream/50">
                 Six-week cohort
               </p>
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-navy/55">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-cream/50">
                 Live online
               </p>
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-navy/55">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-cream/50">
                 Revenue Lab · Free weekly
               </p>
             </div>
           </div>
-
-          <aside className="relative">
-            <div className="relative overflow-hidden bg-navy p-7 text-cream sm:p-9">
-              <div
-                aria-hidden="true"
-                className="absolute -right-16 -top-20 size-64 rounded-full border border-gold/15"
-              />
-              <div
-                aria-hidden="true"
-                className="absolute -right-4 top-4 size-36 rounded-full border border-gold/10"
-              />
-              <p className="relative text-[10px] font-semibold uppercase tracking-[0.24em] text-gold-soft">
-                The ecosystem
-              </p>
-              <div className="relative mt-8 divide-y divide-cream/10 border-y border-cream/10">
-                {[
-                  ["First Quota", "Academy"],
-                  ["Revenue Lab", "Community"],
-                  ["For Companies", "Advisory"],
-                  ["Rinassa AI", "Product"],
-                ].map(([name, label], index) => (
-                  <div
-                    key={name}
-                    className="flex items-center justify-between gap-4 py-4"
-                  >
-                    <div className="flex items-baseline gap-4">
-                      <span className="font-display text-sm text-gold-soft/70">
-                        0{index + 1}
-                      </span>
-                      <span className="font-display text-2xl tracking-[-0.02em]">
-                        {name}
-                      </span>
-                    </div>
-                    <span className="text-[9px] font-semibold uppercase tracking-[0.18em] text-cream/35">
-                      {label}
-                    </span>
-                  </div>
-                ))}
-              </div>
-              <p className="relative mt-8 text-sm leading-6 text-cream/50">
-                One place for commercial education, practical advisory, and the
-                people doing the work.
-              </p>
-            </div>
-            <p className="mt-4 text-right text-[10px] font-medium uppercase tracking-[0.2em] text-navy/35">
-              Education · Advisory · Community
-            </p>
-          </aside>
         </Container>
       </section>
 

@@ -26,12 +26,12 @@ export function BrandMark({
         <span className="absolute -right-[3px] -top-[3px] size-1.5 bg-gold" />
       </span>
       <span>
-        <span className="block text-[13px] font-semibold uppercase tracking-[0.2em]">
+        <span className="block whitespace-nowrap text-[13px] font-semibold uppercase tracking-[0.2em]">
           Hunt n Farm
         </span>
         {compact ? null : (
           <span
-            className={`mt-0.5 block text-[9px] font-medium uppercase tracking-[0.22em] ${
+            className={`mt-0.5 hidden whitespace-nowrap text-[9px] font-medium uppercase tracking-[0.22em] sm:block ${
               tone === "dark" ? "text-cream/45" : "text-navy/45"
             }`}
           >
