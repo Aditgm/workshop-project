@@ -3,6 +3,7 @@ import { getSiteContent } from "@/lib/site-content";
 import { CONTACT_TOPICS } from "@/lib/marketing-validation";
 import { ContactForm } from "@/components/marketing/contact-form";
 import {
+  ArrowUpRight,
   Container,
   PageHero,
   SectionLabel,
@@ -60,6 +61,25 @@ export default async function ContactPage({
                   Direct contact details are being finalised. Use the form and
                   the team will get back to you.
                 </p>
+              ) : null}
+              {content.consultancy.calendlyUrl ? (
+                <div className="pt-4 border-t border-navy/15 mt-4">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-gold">
+                    Advisory Booking
+                  </p>
+                  <p className="mt-1 text-xs text-ink/70">
+                    Need a direct 1-on-1 consultation?
+                  </p>
+                  <a
+                    href={content.consultancy.calendlyUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-2 inline-flex items-center gap-1.5 text-xs font-semibold text-navy hover:text-gold transition-colors"
+                  >
+                    <span>Schedule on Calendly</span>
+                    <ArrowUpRight />
+                  </a>
+                </div>
               ) : null}
             </div>
           </div>

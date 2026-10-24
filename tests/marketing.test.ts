@@ -112,4 +112,23 @@ test("site content falls back to safe defaults and validates", () => {
     parseSiteContent({ contact: { email: "hello@example.com" } }).contact.email,
     "hello@example.com",
   );
+  assert.equal(
+    parseSiteContent({
+      dailyWorkshop: {
+        title: "Custom Workshop Title",
+        meetingLink: "https://zoom.us/j/123456",
+        photos: ["https://example.com/photo.jpg"],
+      },
+    }).dailyWorkshop.title,
+    "Custom Workshop Title",
+  );
+  assert.equal(
+    parseSiteContent({
+      consultancy: {
+        calendlyUrl: "https://calendly.com/test-user/30min",
+      },
+    }).consultancy.calendlyUrl,
+    "https://calendly.com/test-user/30min",
+  );
 });
+

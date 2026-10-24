@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
-import heroCity from "@/assets/hero-city.jpg";
 import { getSiteContent } from "@/lib/site-content";
 import {
   ArrowLink,
@@ -17,8 +15,10 @@ import {
   marketingSectionTitle,
   primaryButton,
   primaryButtonOnDark,
+  secondaryButton,
   secondaryButtonOnDark,
 } from "@/components/marketing/marketing-ui";
+import { DailyWorkshopSection } from "@/components/marketing/daily-workshop";
 
 export const metadata: Metadata = {
   title: "Commercial education, advisory and community",
@@ -62,16 +62,16 @@ export default async function HomePage() {
   return (
     <>
       <section className="relative isolate overflow-hidden border-b border-navy/10 bg-navy text-cream">
-        <Image
-          src={heroCity}
-          alt=""
-          fill
-          priority
-          placeholder="blur"
-          quality={90}
-          sizes="100vw"
-          className="hero-kenburns object-cover object-[68%_center] lg:object-center"
-        />
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          poster="/hero-poster.png"
+          className="absolute inset-0 size-full object-cover object-[68%_center] lg:object-center opacity-85"
+        >
+          <source src="/hero-video.mp4" type="video/mp4" />
+        </video>
         <div
           aria-hidden="true"
           className="absolute inset-0 bg-[linear-gradient(90deg,rgba(4,16,28,0.96)_0%,rgba(5,20,34,0.82)_38%,rgba(5,20,34,0.3)_66%,rgba(5,20,34,0.52)_100%)]"
@@ -130,10 +130,15 @@ export default async function HomePage() {
         </Container>
       </section>
 
+      <DailyWorkshopSection
+        workshop={content.dailyWorkshop}
+        workshops={content.dailyWorkshops}
+      />
+
       <section className={`${marketingSection} bg-cream`}>
         <Container>
           <div className="max-w-3xl">
-            <SectionLabel index="02">What we do</SectionLabel>
+            <SectionLabel index="03">What we do</SectionLabel>
             <h2 className={`${marketingSectionTitle} mt-6`}>
               Practical support for the commercial work that matters.
             </h2>
@@ -178,7 +183,7 @@ export default async function HomePage() {
         <Container className="relative">
           <div className="grid gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:gap-20">
             <div>
-              <SectionLabel index="03" tone="dark">
+              <SectionLabel index="04" tone="dark">
                 First Quota
               </SectionLabel>
               <h2 className="mt-6 font-display text-5xl leading-[0.98] tracking-[-0.035em] text-cream sm:text-6xl">
@@ -231,7 +236,7 @@ export default async function HomePage() {
         <Container>
           <div className="grid gap-12 lg:grid-cols-[0.75fr_1.25fr] lg:gap-20">
             <div>
-              <SectionLabel index="04">For Companies</SectionLabel>
+              <SectionLabel index="05">For Companies</SectionLabel>
               <h2 className={`${marketingSectionTitle} mt-6`}>
                 Build the commercial engine, not just the pitch.
               </h2>
@@ -239,10 +244,51 @@ export default async function HomePage() {
                 Hunt n Farm works with leadership and revenue teams on the
                 systems behind consistent commercial performance.
               </p>
-              <Link href="/for-companies" className={`${primaryButton} mt-8`}>
-                Explore advisory
-                <ArrowUpRight />
-              </Link>
+              <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+                {content.consultancy.calendlyUrl ? (
+                  <a
+                    href={content.consultancy.calendlyUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={primaryButton}
+                  >
+                    {content.consultancy.buttonText || "Book a Consultation"}
+                    <ArrowUpRight />
+                  </a>
+                ) : null}
+                <Link
+                  href="/for-companies"
+                  className={content.consultancy.calendlyUrl ? secondaryButton : primaryButton}
+                >
+                  Explore advisory
+                  <ArrowUpRight />
+                </Link>
+              </div>
+
+              {content.consultancy.calendlyUrl ? (
+                <div className="mt-8 rounded-[2px] border border-gold/40 bg-gold/[0.07] p-5">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-gold">
+                    1-on-1 Advisory Session
+                  </p>
+                  <p className="mt-1 font-display text-xl text-navy">
+                    {content.consultancy.headline || "Strategic Commercial Advisory"}
+                  </p>
+                  <p className="mt-2 text-xs leading-5 text-ink/70">
+                    {content.consultancy.description}
+                  </p>
+                  <div className="mt-4">
+                    <a
+                      href={content.consultancy.calendlyUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 text-xs font-semibold text-navy hover:text-gold transition-colors"
+                    >
+                      <span>Reserve your time slot on Calendly</span>
+                      <ArrowUpRight />
+                    </a>
+                  </div>
+                </div>
+              ) : null}
             </div>
 
             <div>
@@ -280,7 +326,7 @@ export default async function HomePage() {
         <Container>
           <div className="grid gap-8 lg:grid-cols-2">
             <article className="border border-navy/15 bg-cream-soft p-7 sm:p-9">
-              <SectionLabel index="05">Placement</SectionLabel>
+              <SectionLabel index="06">Placement</SectionLabel>
               <h2 className="mt-6 font-display text-4xl tracking-[-0.03em] text-navy sm:text-5xl">
                 Support for the next step.
               </h2>
@@ -304,7 +350,7 @@ export default async function HomePage() {
                 aria-hidden="true"
                 className="absolute -right-16 -top-16 size-56 rounded-full border border-gold/15"
               />
-              <SectionLabel index="06" tone="dark">
+              <SectionLabel index="07" tone="dark">
                 Rinassa AI
               </SectionLabel>
               <h2 className="mt-6 font-display text-4xl tracking-[-0.03em] text-cream sm:text-5xl">

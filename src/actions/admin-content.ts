@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 import { requireAdmin } from "@/lib/auth";
 import type { ActionState } from "@/lib/action-state";
 import { db } from "@/lib/db";
-import { siteContentSchema } from "@/lib/site-content";
+import { siteContentSchema, type WorkshopItem } from "@/lib/site-content";
 import { firstIssue, getString } from "@/lib/validation";
 
 export async function saveSiteContentAction(
@@ -18,6 +18,54 @@ export async function saveSiteContentAction(
     .split(/\r?\n/)
     .map((item) => item.trim())
     .filter(Boolean);
+
+  let workshops: WorkshopItem[] = [];
+  const rawWorkshopsJson = getString(formData, "workshopsJson");
+  if (rawWorkshopsJson) {
+    try {
+      const decoded = JSON.parse(rawWorkshopsJson);
+      if (Array.isArray(decoded) && decoded.length > 0) {
+        workshops = decoded.map((w: Partial<WorkshopItem>, i: number) => ({
+          id: String(w.id || `ws-${i + 1}`),
+          title: String(w.title || "").trim(),
+          description: String(w.description || "").trim(),
+          photos: Array.isArray(w.photos)
+            ? w.photos.map((p) => String(p).trim()).filter(Boolean)
+            : [],
+          meetingLink: String(w.meetingLink || "").trim(),
+          time: String(w.time || "").trim(),
+          date: String(w.date || "").trim(),
+          badge: String(w.badge || "Live Workshop").trim(),
+          isActive: Boolean(w.isActive),
+        }));
+      }
+    } catch {
+      // ignore
+    }
+  }
+
+  if (workshops.length === 0) {
+    const workshopPhotos = getString(formData, "workshopPhotos")
+      .split(/\r?\n/)
+      .map((item) => item.trim())
+      .filter(Boolean);
+
+    workshops = [
+      {
+        id: "ws-1",
+        title: getString(formData, "workshopTitle") || "Daily Commercial Sprint",
+        description: getString(formData, "workshopDescription"),
+        photos: workshopPhotos,
+        meetingLink: getString(formData, "workshopMeetingLink"),
+        time: getString(formData, "workshopTime"),
+        date: getString(formData, "workshopDate"),
+        badge: getString(formData, "workshopBadge") || "Live Daily Workshop",
+        isActive:
+          formData.get("workshopIsActive") === "on" ||
+          formData.get("workshopIsActive") === "true",
+      },
+    ];
+  }
 
   const parsed = siteContentSchema.safeParse({
     home: {
@@ -39,6 +87,14 @@ export async function saveSiteContentAction(
       summary: getString(formData, "revenueLabSummary"),
       schedule: getString(formData, "revenueLabSchedule"),
       format: getString(formData, "revenueLabFormat"),
+    },
+    dailyWorkshops: workshops,
+    dailyWorkshop: workshops[0],
+    consultancy: {
+      calendlyUrl: getString(formData, "consultancyCalendlyUrl"),
+      headline: getString(formData, "consultancyHeadline"),
+      description: getString(formData, "consultancyDescription"),
+      buttonText: getString(formData, "consultancyButtonText") || "Book Consultation on Calendly",
     },
     contact: {
       email: getString(formData, "contactEmail"),
@@ -66,6 +122,8 @@ export async function saveSiteContentAction(
 
     revalidatePath("/", "layout");
     revalidatePath("/admin/content");
+    revalidatePath("/for-companies");
+    revalidatePath("/contact");
 
     return { success: "Site content saved." };
   } catch {

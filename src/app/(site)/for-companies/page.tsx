@@ -14,6 +14,8 @@ import {
   secondaryButton,
 } from "@/components/marketing/marketing-ui";
 
+import { getSiteContent } from "@/lib/site-content";
+
 export const metadata: Metadata = {
   title: "For Companies | Commercial advisory",
   description:
@@ -43,29 +45,63 @@ const services = [
   },
 ];
 
-export default function ForCompaniesPage() {
+export default async function ForCompaniesPage() {
+  const content = await getSiteContent();
+  const consultancy = content.consultancy;
+
   return (
     <>
       <PageHero
         index="03"
         eyebrow="For Companies"
         title="Commercial capability, inside the business."
-        intro="Hunt n Farm works with leadership and revenue teams on the systems behind consistent commercial performance: the market, the process, the pipeline, and the people."
+        intro={
+          consultancy.description ||
+          "Hunt n Farm works with leadership and revenue teams on the systems behind consistent commercial performance: the market, the process, the pipeline, and the people."
+        }
         aside={
           <div className="border-l border-gold/50 pl-6">
             <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-gold">
               Consulting focus
             </p>
             <p className="mt-3 font-display text-3xl leading-tight tracking-[-0.025em] text-navy">
-              Practical engagements shaped around the next stage of growth.
+              {consultancy.headline || "Practical engagements shaped around the next stage of growth."}
             </p>
+            {consultancy.calendlyUrl ? (
+              <div className="mt-4">
+                <a
+                  href={consultancy.calendlyUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-gold hover:text-navy transition-colors uppercase tracking-wider"
+                >
+                  <span>Book via Calendly</span>
+                  <ArrowUpRight />
+                </a>
+              </div>
+            ) : null}
           </div>
         }
       >
         <div className="flex flex-col gap-3 sm:flex-row">
-          <Link href="/contact?topic=consulting" className={primaryButton}>
-            Start a conversation
-            <ArrowUpRight />
+          {consultancy.calendlyUrl ? (
+            <a
+              href={consultancy.calendlyUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={primaryButton}
+            >
+              {consultancy.buttonText || "Book Consultation on Calendly"}
+              <ArrowUpRight />
+            </a>
+          ) : (
+            <Link href="/contact?topic=consulting" className={primaryButton}>
+              Start a conversation
+              <ArrowUpRight />
+            </Link>
+          )}
+          <Link href="/contact?topic=consulting" className={secondaryButton}>
+            Send an enquiry
           </Link>
           <Link href="/about" className={secondaryButton}>
             About Hunt n Farm
@@ -166,8 +202,22 @@ export default function ForCompaniesPage() {
               </p>
             </div>
             <div className="flex flex-col gap-3 sm:flex-row lg:justify-end">
-              <Link href="/contact?topic=consulting" className={primaryButton}>
-                Contact us
+              {consultancy.calendlyUrl ? (
+                <a
+                  href={consultancy.calendlyUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={primaryButton}
+                >
+                  Schedule on Calendly
+                  <ArrowUpRight />
+                </a>
+              ) : null}
+              <Link
+                href="/contact?topic=consulting"
+                className={consultancy.calendlyUrl ? secondaryButton : primaryButton}
+              >
+                Send a message
                 <ArrowUpRight />
               </Link>
               <ArrowLink href="/programs" className="self-center">

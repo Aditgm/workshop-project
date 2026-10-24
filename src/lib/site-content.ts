@@ -5,6 +5,48 @@ import { db } from "@/lib/db";
 const shortText = z.string().trim().min(1).max(200);
 const longText = z.string().trim().min(1).max(5000);
 
+export const DEFAULT_WORKSHOP_PHOTOS = [
+  {
+    id: "preset-1",
+    label: "Strategy & Deal Review",
+    url: "https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=1200&q=80",
+  },
+  {
+    id: "preset-2",
+    label: "Team Collaboration",
+    url: "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&w=1200&q=80",
+  },
+  {
+    id: "preset-3",
+    label: "Executive Coaching",
+    url: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1200&q=80",
+  },
+  {
+    id: "preset-4",
+    label: "Pitch & Presentation",
+    url: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=1200&q=80",
+  },
+  {
+    id: "preset-5",
+    label: "Live Workshop Session",
+    url: "https://images.unsplash.com/photo-1515187029135-18ee286d815b?auto=format&fit=crop&w=1200&q=80",
+  },
+];
+
+export const workshopItemSchema = z.object({
+  id: z.string().trim().min(1).max(100),
+  title: z.string().trim().max(250),
+  description: z.string().trim().max(4000),
+  photos: z.array(z.string().trim().max(1000)).max(20),
+  meetingLink: z.string().trim().max(1000),
+  time: z.string().trim().max(120),
+  date: z.string().trim().max(120),
+  badge: z.string().trim().max(100),
+  isActive: z.boolean(),
+});
+
+export type WorkshopItem = z.infer<typeof workshopItemSchema>;
+
 export const siteContentSchema = z.object({
   home: z.object({
     kicker: z.string().trim().min(1).max(120),
@@ -26,6 +68,14 @@ export const siteContentSchema = z.object({
     schedule: shortText,
     format: shortText,
   }),
+  dailyWorkshops: z.array(workshopItemSchema).max(30),
+  dailyWorkshop: workshopItemSchema,
+  consultancy: z.object({
+    calendlyUrl: z.string().trim().max(1000),
+    headline: z.string().trim().max(250),
+    description: z.string().trim().max(3000),
+    buttonText: z.string().trim().max(120),
+  }),
   contact: z.object({
     email: z.union([z.literal(""), z.string().trim().email().max(254)]),
     phone: z.string().trim().max(80),
@@ -38,6 +88,54 @@ export const siteContentSchema = z.object({
 });
 
 export type SiteContent = z.infer<typeof siteContentSchema>;
+
+const defaultWorkshops: WorkshopItem[] = [
+  {
+    id: "ws-1",
+    title: "Daily Commercial Sprint: Live Pipeline & Deal Review",
+    description:
+      "Join our live interactive daily workshop where we review real-world pipeline scenarios, buyer objections, and live pitch refinement. Open to revenue professionals, founders, and sales leaders looking to sharpen their sales execution.",
+    photos: [
+      DEFAULT_WORKSHOP_PHOTOS[0].url,
+      DEFAULT_WORKSHOP_PHOTOS[1].url,
+    ],
+    meetingLink: "https://meet.google.com",
+    time: "4:00 PM – 5:00 PM EST",
+    date: "Monday to Friday",
+    badge: "Today's Live Workshop",
+    isActive: true,
+  },
+  {
+    id: "ws-2",
+    title: "Discovery & Qualification: Account Context Masterclass",
+    description:
+      "A hands-on workshop focused on diagnostic questioning, buyer persona mapping, and qualifying opportunities before demoing. Learn how top reps avoid wasted cycles.",
+    photos: [
+      DEFAULT_WORKSHOP_PHOTOS[2].url,
+      DEFAULT_WORKSHOP_PHOTOS[3].url,
+    ],
+    meetingLink: "https://meet.google.com",
+    time: "10:00 AM – 11:30 AM EST",
+    date: "Tuesdays & Thursdays",
+    badge: "Weekly Lab",
+    isActive: true,
+  },
+  {
+    id: "ws-3",
+    title: "Executive Outbound & Account Penetration Sprint",
+    description:
+      "Learn the outbound habits that create enterprise pipeline: account selection, executive triggers, tailored video outreach, and securing the first commercial conversation.",
+    photos: [
+      DEFAULT_WORKSHOP_PHOTOS[4].url,
+      DEFAULT_WORKSHOP_PHOTOS[0].url,
+    ],
+    meetingLink: "https://meet.google.com",
+    time: "2:00 PM – 3:30 PM EST",
+    date: "Fridays",
+    badge: "Special Masterclass",
+    isActive: true,
+  },
+];
 
 export const defaultSiteContent: SiteContent = {
   home: {
@@ -72,6 +170,15 @@ export const defaultSiteContent: SiteContent = {
     schedule: "Weekly sessions",
     format: "Online and open to join",
   },
+  dailyWorkshops: defaultWorkshops,
+  dailyWorkshop: defaultWorkshops[0],
+  consultancy: {
+    calendlyUrl: "https://calendly.com",
+    headline: "Book a Strategic Commercial Advisory Call",
+    description:
+      "Schedule a 1-on-1 consultation session with our commercial directors to diagnose your sales pipeline, refine outbound motions, or review commercial capability.",
+    buttonText: "Schedule Consultation on Calendly",
+  },
   contact: {
     email: "",
     phone: "",
@@ -95,17 +202,42 @@ function withDefaults(base: unknown, value: unknown): unknown {
   }
 
   return Object.fromEntries(
-    Object.entries(base).map(([key, fallback]) => [
-      key,
-      key in value ? withDefaults(fallback, value[key]) : fallback,
-    ]),
+    Object.entries(base).map(([key, fallback]) => {
+      if (Array.isArray(fallback) && key in value && Array.isArray((value as Record<string, unknown>)[key])) {
+        const valArr = (value as Record<string, unknown>)[key] as unknown[];
+        return [key, valArr.length > 0 ? valArr : fallback];
+      }
+      return [
+        key,
+        key in value ? withDefaults(fallback, (value as Record<string, unknown>)[key]) : fallback,
+      ];
+    }),
   );
 }
 
 export function parseSiteContent(value: unknown): SiteContent {
-  const parsed = siteContentSchema.safeParse(
-    withDefaults(defaultSiteContent, value),
-  );
+  const isObj = isRecord(value);
+  const hasDailyWorkshop = isObj && "dailyWorkshop" in value && isRecord(value.dailyWorkshop);
+  const hasDailyWorkshops = isObj && "dailyWorkshops" in value && Array.isArray(value.dailyWorkshops);
+
+  let normalizedValue = value;
+  if (isObj && hasDailyWorkshop && !hasDailyWorkshops) {
+    const rawDw = (value as Record<string, unknown>).dailyWorkshop;
+    const completedDw = withDefaults(defaultSiteContent.dailyWorkshop, rawDw);
+    normalizedValue = {
+      ...value,
+      dailyWorkshop: completedDw,
+      dailyWorkshops: [completedDw],
+    };
+  }
+
+  const merged = withDefaults(defaultSiteContent, normalizedValue) as Record<string, unknown>;
+
+  if (Array.isArray(merged.dailyWorkshops) && merged.dailyWorkshops.length > 0) {
+    merged.dailyWorkshop = merged.dailyWorkshops[0] as WorkshopItem;
+  }
+
+  const parsed = siteContentSchema.safeParse(merged);
   return parsed.success ? parsed.data : defaultSiteContent;
 }
 

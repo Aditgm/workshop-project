@@ -29,10 +29,9 @@ export default async function AdminContentPage() {
 
       <div className={`${adminPanel} mt-7 p-5 text-xs leading-6 text-cream/45`}>
         <p>
-          Editable here: homepage introduction, First Quota details and
+          Editable here: homepage introduction, Daily Workshop (title, description, photos, meeting link), Consultancy (Calendly link), First Quota details and
           curriculum, Revenue Lab summary, contact details, and the About
-          introduction. Programme pages and the legal pages contain static copy
-          and should be reviewed before launch.
+          introduction.
         </p>
       </div>
 
