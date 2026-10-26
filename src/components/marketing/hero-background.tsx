@@ -1,16 +1,21 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useIsMobile } from "@/lib/use-mobile";
 
 export function HeroBackground() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
+  const isMobile = useIsMobile();
+  const videoSrc = isMobile ? "/hero-video-mobile.mp4" : "/hero-video.mp4";
+  const posterSrc = isMobile ? "/hero-poster-mobile.webp" : "/hero-poster.webp";
 
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
 
-    // Attempt video autoplay with graceful fallback
+    // Load and attempt autoplay when video source resolves
+    video.load();
     const playPromise = video.play();
     if (playPromise !== undefined) {
       playPromise
@@ -23,7 +28,7 @@ export function HeroBackground() {
           setIsVideoPlaying(false);
         });
     }
-  }, []);
+  }, [videoSrc]);
 
   return (
     <div className="absolute inset-0 size-full overflow-hidden pointer-events-none">
@@ -50,12 +55,14 @@ export function HeroBackground() {
 
       {/* 
         Layer 2: Looping Video
+        Dynamically uses hero-video-mobile.mp4 when mobile is detected.
         Configured with mobile-friendly attributes:
         - playsInline & webkit-playsinline to prevent unwanted full-screen takeovers
         - preload="metadata" to avoid hogging bandwidth on mobile connections
         - Smooth opacity transition once the video stream begins
       */}
       <video
+        key={videoSrc}
         ref={videoRef}
         autoPlay
         muted
@@ -64,14 +71,21 @@ export function HeroBackground() {
         preload="metadata"
         disablePictureInPicture
         disableRemotePlayback
-        poster="/hero-poster-mobile.webp"
+        poster={posterSrc}
         onPlaying={() => setIsVideoPlaying(true)}
+        onWaiting={() => setIsVideoPlaying(false)}
         className={`absolute inset-0 size-full object-cover object-[62%_center] sm:object-[68%_center] lg:object-center transition-opacity duration-700 transform-gpu ${
           isVideoPlaying ? "opacity-85" : "opacity-0"
         }`}
       >
-        <source src="/hero-video.mp4" type="video/mp4" />
+        <source
+          src="/hero-video-mobile.mp4"
+          type="video/mp4"
+          media="(max-width: 768px)"
+        />
+        <source src={videoSrc} type="video/mp4" />
       </video>
     </div>
   );
 }
+

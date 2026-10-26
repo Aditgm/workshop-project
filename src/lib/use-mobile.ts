@@ -1,8 +1,32 @@
 "use client";
 
-import { useEffect, useState, useSyncExternalStore } from "react";
+import { useEffect, useSyncExternalStore } from "react";
 
-const emptySubscribe = () => () => {};
+function subscribe(callback: () => void) {
+  window.addEventListener("resize", callback, { passive: true });
+  window.addEventListener("orientationchange", callback, { passive: true });
+  return () => {
+    window.removeEventListener("resize", callback);
+    window.removeEventListener("orientationchange", callback);
+  };
+}
+
+function getSnapshot(): boolean {
+  if (typeof window === "undefined") return false;
+  const isNarrow = window.innerWidth < 768;
+  const isTouch =
+    "ontouchstart" in window ||
+    navigator.maxTouchPoints > 0 ||
+    /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+      navigator.userAgent,
+    );
+
+  return isNarrow || (isTouch && window.innerWidth < 1024);
+}
+
+function getServerSnapshot(): boolean {
+  return false;
+}
 
 /**
  * Detects if the current client is a mobile device based on:
@@ -10,46 +34,20 @@ const emptySubscribe = () => () => {};
  * - User agent touch / mobile indicators
  */
 export function useIsMobile(): boolean {
-  const isClient = useSyncExternalStore(
-    emptySubscribe,
-    () => true,
-    () => false,
+  const isMobile = useSyncExternalStore(
+    subscribe,
+    getSnapshot,
+    getServerSnapshot,
   );
 
-  const [isMobile, setIsMobile] = useState<boolean>(false);
-
   useEffect(() => {
-    if (!isClient) return;
-
-    const checkMobile = () => {
-      const isNarrow = window.innerWidth < 768;
-      const isTouch =
-        "ontouchstart" in window ||
-        navigator.maxTouchPoints > 0 ||
-        /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-          navigator.userAgent,
-        );
-
-      const detected = isNarrow || (isTouch && window.innerWidth < 1024);
-      setIsMobile(detected);
-
-      // Set data attribute on documentElement for CSS styling
-      if (detected) {
-        document.documentElement.dataset.device = "mobile";
-      } else {
-        delete document.documentElement.dataset.device;
-      }
-    };
-
-    checkMobile();
-    window.addEventListener("resize", checkMobile, { passive: true });
-    window.addEventListener("orientationchange", checkMobile, { passive: true });
-
-    return () => {
-      window.removeEventListener("resize", checkMobile);
-      window.removeEventListener("orientationchange", checkMobile);
-    };
-  }, [isClient]);
+    if (isMobile) {
+      document.documentElement.dataset.device = "mobile";
+    } else {
+      delete document.documentElement.dataset.device;
+    }
+  }, [isMobile]);
 
   return isMobile;
 }
+
