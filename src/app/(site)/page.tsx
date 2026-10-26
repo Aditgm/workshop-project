@@ -19,6 +19,7 @@ import {
   secondaryButtonOnDark,
 } from "@/components/marketing/marketing-ui";
 import { DailyWorkshopSection } from "@/components/marketing/daily-workshop";
+import { HeroBackground } from "@/components/marketing/hero-background";
 
 export const metadata: Metadata = {
   title: "Commercial education, advisory and community",
@@ -62,16 +63,7 @@ export default async function HomePage() {
   return (
     <>
       <section className="relative isolate overflow-hidden border-b border-navy/10 bg-navy text-cream">
-        <video
-          autoPlay
-          muted
-          loop
-          playsInline
-          poster="/hero-poster.png"
-          className="absolute inset-0 size-full object-cover object-[68%_center] lg:object-center opacity-85"
-        >
-          <source src="/hero-video.mp4" type="video/mp4" />
-        </video>
+        <HeroBackground />
         <div
           aria-hidden="true"
           className="absolute inset-0 bg-[linear-gradient(90deg,rgba(4,16,28,0.96)_0%,rgba(5,20,34,0.82)_38%,rgba(5,20,34,0.3)_66%,rgba(5,20,34,0.52)_100%)]"

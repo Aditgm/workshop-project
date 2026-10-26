@@ -3,10 +3,13 @@
 import { useActionState, useState, useRef } from "react";
 import {
   DEFAULT_WORKSHOP_PHOTOS,
+  defaultEventPopup,
   type WorkshopItem,
   type SiteContent,
+  type EventPopupConfig,
 } from "@/lib/site-content";
 import { DailyWorkshopSection } from "@/components/marketing/daily-workshop";
+import { EventPopup } from "@/components/marketing/event-popup";
 import { saveSiteContentAction } from "@/actions/admin-content";
 import { SubmitButton } from "@/components/submit-button";
 import {
@@ -258,6 +261,15 @@ export function ContentEditor({ content }: { content: SiteContent }) {
   });
 
   const [showLivePreview, setShowLivePreview] = useState(false);
+
+  const [eventPopup, setEventPopup] = useState<EventPopupConfig>(() => {
+    return content.eventPopup || defaultEventPopup;
+  });
+  const [showPopupModalPreview, setShowPopupModalPreview] = useState(false);
+
+  const updateEventPopup = (field: keyof EventPopupConfig, value: unknown) => {
+    setEventPopup((prev) => ({ ...prev, [field]: value }));
+  };
 
   const currentWorkshop =
     workshops.find((w) => w.id === activeWorkshopId) ||
@@ -637,6 +649,388 @@ export function ContentEditor({ content }: { content: SiteContent }) {
             </div>
           </div>
         )}
+      </Section>
+
+      <Section
+        title="Event Popup Notification"
+        description="Configure the bottom-sheet banner shown to visitors on mobile and desktop. Promotes upcoming live sessions and allows visitors to browse all nearby events."
+        action={
+          <button
+            type="button"
+            onClick={() => setShowPopupModalPreview(true)}
+            className="inline-flex items-center gap-1.5 rounded-[2px] border border-gold/40 bg-gold/10 px-3 py-1.5 text-xs font-semibold text-gold-soft hover:border-gold hover:bg-gold/20 transition cursor-pointer"
+          >
+            <span>✨</span> Test Popup On Screen
+          </button>
+        }
+      >
+        {/* Hidden inputs to save popup configuration */}
+        <input
+          type="hidden"
+          name="eventPopupEnabled"
+          value={eventPopup.enabled ? "true" : "false"}
+        />
+        <input
+          type="hidden"
+          name="eventPopupMode"
+          value={eventPopup.mode}
+        />
+        <input
+          type="hidden"
+          name="eventPopupDisplayFrequency"
+          value={eventPopup.displayFrequency}
+        />
+
+        {/* Master Enabled Toggle */}
+        <div className="flex flex-wrap items-center justify-between gap-4 rounded-[2px] border border-cream/15 bg-cream/[0.03] p-4 sm:p-5">
+          <div className="flex items-center gap-3">
+            <input
+              type="checkbox"
+              id="eventPopupEnabledToggle"
+              checked={eventPopup.enabled}
+              onChange={(e) => updateEventPopup("enabled", e.target.checked)}
+              className="size-4.5 rounded border-cream/20 bg-cream/5 text-gold focus:ring-gold cursor-pointer"
+            />
+            <div>
+              <label
+                htmlFor="eventPopupEnabledToggle"
+                className="text-sm font-semibold text-cream cursor-pointer"
+              >
+                Enable Event Popup Notification on Public Site
+              </label>
+              <p className="text-xs text-cream/40">
+                When enabled, visitors will see the bottom-sheet banner with nearby workshop details.
+              </p>
+            </div>
+          </div>
+          <span
+            className={`rounded-[2px] px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wider ${
+              eventPopup.enabled
+                ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"
+                : "bg-cream/10 text-cream/40 border border-cream/15"
+            }`}
+          >
+            {eventPopup.enabled ? "Active on site" : "Disabled"}
+          </span>
+        </div>
+
+        {/* Display Mode Selection */}
+        <div>
+          <label className={adminLabel}>Event Display Mode</label>
+          <div className="grid gap-3 sm:grid-cols-3">
+            <button
+              type="button"
+              onClick={() => updateEventPopup("mode", "all_active")}
+              className={`rounded-[2px] border p-4 text-left transition cursor-pointer ${
+                eventPopup.mode === "all_active"
+                  ? "border-gold bg-gold/10 text-cream ring-1 ring-gold/40"
+                  : "border-cream/15 bg-cream/[0.02] text-cream/70 hover:border-cream/30 hover:bg-cream/[0.05]"
+              }`}
+            >
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-gold-soft uppercase tracking-wider">
+                  All Nearby Events
+                </span>
+                <span className="text-[10px] text-emerald-400 font-semibold">Recommended</span>
+              </div>
+              <p className="mt-1.5 text-xs text-cream/70 leading-5">
+                Automatically loads active workshops. If multiple events are scheduled, visitors can flip through each nearby event.
+              </p>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => updateEventPopup("mode", "first_active")}
+              className={`rounded-[2px] border p-4 text-left transition cursor-pointer ${
+                eventPopup.mode === "first_active"
+                  ? "border-gold bg-gold/10 text-cream ring-1 ring-gold/40"
+                  : "border-cream/15 bg-cream/[0.02] text-cream/70 hover:border-cream/30 hover:bg-cream/[0.05]"
+              }`}
+            >
+              <span className="text-xs font-bold text-gold-soft uppercase tracking-wider">
+                First Active Event
+              </span>
+              <p className="mt-1.5 text-xs text-cream/70 leading-5">
+                Always focuses solely on the nearest/top active workshop in your list.
+              </p>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => updateEventPopup("mode", "custom")}
+              className={`rounded-[2px] border p-4 text-left transition cursor-pointer ${
+                eventPopup.mode === "custom"
+                  ? "border-gold bg-gold/10 text-cream ring-1 ring-gold/40"
+                  : "border-cream/15 bg-cream/[0.02] text-cream/70 hover:border-cream/30 hover:bg-cream/[0.05]"
+              }`}
+            >
+              <span className="text-xs font-bold text-gold-soft uppercase tracking-wider">
+                Custom Announcement
+              </span>
+              <p className="mt-1.5 text-xs text-cream/70 leading-5">
+                Disregards workshops and exclusively displays your custom headline, copy, and link below.
+              </p>
+            </button>
+          </div>
+        </div>
+
+        {/* Content Overrides and Customization */}
+        <div className="grid gap-5 sm:grid-cols-2">
+          <div>
+            <label htmlFor="eventPopupKicker" className={adminLabel}>
+              Kicker / Eyebrow Text
+            </label>
+            <input
+              id="eventPopupKicker"
+              name="eventPopupKicker"
+              value={eventPopup.kicker}
+              onChange={(e) => updateEventPopup("kicker", e.target.value)}
+              maxLength={120}
+              className={adminInput}
+              placeholder="e.g. HAPPENING TODAY or UPCOMING LIVE SESSION"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="eventPopupDateTime" className={adminLabel}>
+              Date & Time Display
+            </label>
+            <input
+              id="eventPopupDateTime"
+              name="eventPopupDateTime"
+              value={eventPopup.dateTime}
+              onChange={(e) => updateEventPopup("dateTime", e.target.value)}
+              maxLength={150}
+              className={adminInput}
+              placeholder="e.g. Today · 6:00 PM IST (Leave blank to use workshop date/time)"
+            />
+          </div>
+        </div>
+
+        <div>
+          <label htmlFor="eventPopupTitle" className={adminLabel}>
+            Headline / Event Title
+          </label>
+          <input
+            id="eventPopupTitle"
+            name="eventPopupTitle"
+            value={eventPopup.title}
+            onChange={(e) => updateEventPopup("title", e.target.value)}
+            maxLength={250}
+            className={adminInput}
+            placeholder="e.g. Revenue Lab: From strategy to action (Leave blank to use active workshop title)"
+          />
+          <p className="mt-1.5 text-xs text-cream/35">
+            {eventPopup.mode !== "custom"
+              ? "Leave blank to automatically display the active workshop's title."
+              : "Headline displayed prominently on the banner."}
+          </p>
+        </div>
+
+        <div>
+          <label htmlFor="eventPopupDescription" className={adminLabel}>
+            Description / Overview
+          </label>
+          <textarea
+            id="eventPopupDescription"
+            name="eventPopupDescription"
+            value={eventPopup.description}
+            onChange={(e) => updateEventPopup("description", e.target.value)}
+            maxLength={2000}
+            className={`${adminTextarea} min-h-24`}
+            placeholder="e.g. Learn one practical way to improve your sales process in this week's live session. (Leave blank to use active workshop description)"
+          />
+          <p className="mt-1.5 text-xs text-cream/35">
+            {eventPopup.mode !== "custom"
+              ? "Leave blank to automatically display the active workshop's description."
+              : "Overview text explaining the event."}
+          </p>
+        </div>
+
+        <div className="grid gap-5 sm:grid-cols-2">
+          <div>
+            <label htmlFor="eventPopupCtaText" className={adminLabel}>
+              Primary Button Text
+            </label>
+            <input
+              id="eventPopupCtaText"
+              name="eventPopupCtaText"
+              value={eventPopup.ctaText}
+              onChange={(e) => updateEventPopup("ctaText", e.target.value)}
+              maxLength={100}
+              className={adminInput}
+              placeholder="e.g. Register for free"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="eventPopupCtaLink" className={adminLabel}>
+              Primary Button Link (URL or Meeting Link)
+            </label>
+            <input
+              id="eventPopupCtaLink"
+              name="eventPopupCtaLink"
+              value={eventPopup.ctaLink}
+              onChange={(e) => updateEventPopup("ctaLink", e.target.value)}
+              maxLength={1000}
+              className={adminInput}
+              placeholder="https://meet.google.com/... or /revenue-lab (Leave blank to use workshop link)"
+            />
+          </div>
+        </div>
+
+        <div className="grid gap-5 sm:grid-cols-3">
+          <div>
+            <label htmlFor="eventPopupSecondaryText" className={adminLabel}>
+              Dismiss Button Text
+            </label>
+            <input
+              id="eventPopupSecondaryText"
+              name="eventPopupSecondaryText"
+              value={eventPopup.secondaryText}
+              onChange={(e) => updateEventPopup("secondaryText", e.target.value)}
+              maxLength={100}
+              className={adminInput}
+              placeholder="e.g. Maybe later"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="eventPopupDelaySeconds" className={adminLabel}>
+              Popup Delay (Seconds)
+            </label>
+            <input
+              id="eventPopupDelaySeconds"
+              name="eventPopupDelaySeconds"
+              type="number"
+              step="0.5"
+              min="0"
+              max="60"
+              value={eventPopup.delaySeconds}
+              onChange={(e) =>
+                updateEventPopup("delaySeconds", parseFloat(e.target.value) || 0)
+              }
+              className={adminInput}
+            />
+          </div>
+
+          <div>
+            <label className={adminLabel}>Display Frequency</label>
+            <select
+              value={eventPopup.displayFrequency}
+              onChange={(e) =>
+                updateEventPopup(
+                  "displayFrequency",
+                  e.target.value as EventPopupConfig["displayFrequency"],
+                )
+              }
+              className={adminInput}
+            >
+              <option value="every_session">Once per session (Normal)</option>
+              <option value="always">Every page visit (Testing)</option>
+              <option value="once_a_day">Once per 24 hours</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Live Admin Preview of the Popup Card */}
+        <div className="mt-4 pt-4 border-t border-cream/10">
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-gold-soft">
+              Interactive Live Preview
+            </p>
+            <span className="text-[10px] text-cream/40">
+              Matches mobile bottom sheet & desktop banner
+            </span>
+          </div>
+
+          <div className="max-w-md mx-auto rounded-2xl border border-gold/30 bg-[#FAF7F0] p-5 shadow-xl text-navy relative overflow-hidden">
+            <div className="mx-auto -mt-1 mb-3 h-1 w-11 rounded-full bg-navy/20" />
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#B8860B]">
+                {eventPopup.kicker || "HAPPENING TODAY"}
+              </span>
+              {eventPopup.mode === "all_active" && workshops.filter((w) => w.isActive).length > 1 ? (
+                <span className="rounded-full border border-navy/15 bg-white/70 px-2 py-0.5 text-[9px] font-semibold text-navy/70">
+                  1 of {workshops.filter((w) => w.isActive).length} nearby
+                </span>
+              ) : null}
+            </div>
+
+            <h4 className="mt-2 font-display text-2xl font-bold tracking-tight text-navy leading-tight">
+              {(eventPopup.mode === "custom" ? eventPopup.title : currentWorkshop.title) ||
+                eventPopup.title ||
+                "Revenue Lab: From strategy to action"}
+            </h4>
+
+            <p className="mt-2 text-xs leading-relaxed text-ink/75 line-clamp-3">
+              {(eventPopup.mode === "custom"
+                ? eventPopup.description
+                : currentWorkshop.description) ||
+                eventPopup.description ||
+                "Learn one practical way to improve your sales process in this week's live session."}
+            </p>
+
+            <div className="my-3 border-t border-navy/10" />
+
+            <div className="mb-4 flex items-center gap-2 text-xs font-semibold text-navy">
+              <svg
+                className="size-4 text-[#B8860B]"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                />
+              </svg>
+              <span>
+                {(eventPopup.mode === "custom"
+                  ? eventPopup.dateTime
+                  : [currentWorkshop.date, currentWorkshop.time]
+                      .filter(Boolean)
+                      .join(" · ")) ||
+                  eventPopup.dateTime ||
+                  "Today · 6:00 PM IST"}
+              </span>
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <div className="flex w-full items-center justify-center gap-1.5 rounded-[4px] bg-[#B8860B] py-2.5 text-xs font-semibold text-white shadow-sm">
+                <span>{eventPopup.ctaText || "Register for free"}</span>
+                <span>↗</span>
+              </div>
+              <p className="text-center text-[11px] text-navy/70 underline">
+                {eventPopup.secondaryText || "Maybe later"}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Full-screen popup simulation overlay if clicked */}
+        {showPopupModalPreview ? (
+          <div className="fixed inset-0 z-[100] flex flex-col justify-end">
+            <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[110] flex items-center gap-3 rounded-full bg-navy px-4 py-2 text-xs font-semibold text-cream shadow-2xl border border-gold/40">
+              <span className="size-2 rounded-full bg-emerald-400 animate-ping" />
+              <span>Simulating Live Screen Popup</span>
+              <button
+                type="button"
+                onClick={() => setShowPopupModalPreview(false)}
+                className="ml-2 rounded bg-cream/20 px-2 py-0.5 text-[11px] hover:bg-cream/30 text-cream cursor-pointer"
+              >
+                Close Preview
+              </button>
+            </div>
+            <EventPopup
+              config={eventPopup}
+              workshops={workshops}
+              isPreview={true}
+            />
+          </div>
+        ) : null}
       </Section>
 
       <Section

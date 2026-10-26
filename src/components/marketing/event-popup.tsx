@@ -1,0 +1,308 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import type { EventPopupConfig, WorkshopItem } from "@/lib/site-content";
+
+export function EventPopup({
+  config,
+  workshops = [],
+  isPreview = false,
+}: {
+  config: EventPopupConfig;
+  workshops?: WorkshopItem[];
+  isPreview?: boolean;
+}) {
+  const [isOpen, setIsOpen] = useState(isPreview);
+  const [isRendered, setIsRendered] = useState(isPreview);
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  // Filter active workshops
+  const activeWorkshops = workshops.filter((w) => w.isActive);
+
+  // In preview mode or custom mode with no active workshops, ensure we have a fallback
+  const totalEvents =
+    config.mode === "custom"
+      ? 1
+      : activeWorkshops.length > 0
+        ? config.mode === "first_active"
+          ? 1
+          : activeWorkshops.length
+        : 1;
+
+  // Resolve current event details
+  const hasWorkshop =
+    config.mode !== "custom" && activeWorkshops.length > 0;
+  const currentWorkshop = hasWorkshop
+    ? activeWorkshops[currentIndex] || activeWorkshops[0]
+    : null;
+
+  const kicker =
+    currentWorkshop?.badge?.trim() || config.kicker || "HAPPENING TODAY";
+
+  const title =
+    (config.mode === "custom" ? config.title : currentWorkshop?.title) ||
+    config.title ||
+    "Revenue Lab: From strategy to action";
+
+  const description =
+    (config.mode === "custom"
+      ? config.description
+      : currentWorkshop?.description) ||
+    config.description ||
+    "Learn one practical way to improve your sales process in this week's live session.";
+
+  const workshopDateTime = currentWorkshop
+    ? [currentWorkshop.date, currentWorkshop.time].filter(Boolean).join(" · ")
+    : "";
+
+  const dateTime =
+    (config.mode === "custom" ? config.dateTime : workshopDateTime) ||
+    config.dateTime ||
+    "Today · 6:00 PM IST";
+
+  const ctaLink =
+    (config.mode === "custom"
+      ? config.ctaLink
+      : currentWorkshop?.meetingLink) ||
+    config.ctaLink ||
+    "https://meet.google.com";
+
+  const ctaText = config.ctaText || "Register for free";
+  const secondaryText = config.secondaryText || "Maybe later";
+
+  // Check display rules on mount (client-side only)
+  useEffect(() => {
+    if (isPreview) {
+      setIsRendered(true);
+      setIsOpen(true);
+      return;
+    }
+
+    if (!config.enabled) {
+      return;
+    }
+
+    // Check frequency dismissal
+    if (config.displayFrequency === "every_session") {
+      const dismissed = sessionStorage.getItem("hnf_event_popup_dismissed");
+      if (dismissed === "true") return;
+    } else if (config.displayFrequency === "once_a_day") {
+      const dismissedUntil = localStorage.getItem(
+        "hnf_event_popup_dismissed_until",
+      );
+      if (dismissedUntil && Number(dismissedUntil) > Date.now()) {
+        return;
+      }
+    }
+
+    // Wait for delay
+    const delayMs = Math.max(config.delaySeconds || 1.5, 0.2) * 1000;
+    const timer = setTimeout(() => {
+      setIsRendered(true);
+      // Small tick for CSS transition
+      requestAnimationFrame(() => {
+        setIsOpen(true);
+      });
+    }, delayMs);
+
+    return () => clearTimeout(timer);
+  }, [config.enabled, config.delaySeconds, config.displayFrequency, isPreview]);
+
+  const handleDismiss = () => {
+    setIsOpen(false);
+    setTimeout(() => {
+      setIsRendered(false);
+    }, 450);
+
+    if (!isPreview) {
+      if (config.displayFrequency === "every_session") {
+        sessionStorage.setItem("hnf_event_popup_dismissed", "true");
+      } else if (config.displayFrequency === "once_a_day") {
+        const expires = Date.now() + 24 * 60 * 60 * 1000;
+        localStorage.setItem(
+          "hnf_event_popup_dismissed_until",
+          expires.toString(),
+        );
+      }
+    }
+  };
+
+  const handleNextEvent = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (totalEvents > 1) {
+      setCurrentIndex((prev) => (prev + 1) % totalEvents);
+    }
+  };
+
+  const handlePrevEvent = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (totalEvents > 1) {
+      setCurrentIndex((prev) => (prev - 1 + totalEvents) % totalEvents);
+    }
+  };
+
+  if (!isRendered) {
+    return null;
+  }
+
+  return (
+    <>
+      {/* Backdrop overlay scrim */}
+      <div
+        onClick={handleDismiss}
+        aria-hidden="true"
+        className={`fixed inset-0 z-40 bg-navy/30 backdrop-blur-[2px] transition-opacity duration-500 ease-out ${
+          isOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+        }`}
+      />
+
+      {/* Floating Bottom Sheet / Popup Card */}
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-label="Upcoming Event Announcement"
+        className={`fixed inset-x-0 bottom-0 z-50 p-2 sm:p-5 sm:inset-x-auto sm:right-6 sm:bottom-6 sm:max-w-md w-full transition-all duration-500 ease-out transform ${
+          isOpen
+            ? "translate-y-0 opacity-100 pointer-events-auto"
+            : "translate-y-12 opacity-0 pointer-events-none"
+        }`}
+      >
+        <div className="relative overflow-hidden rounded-t-[22px] sm:rounded-2xl border border-navy/15 bg-[#FAF7F0] p-5 sm:p-6 shadow-[0_20px_50px_rgba(10,35,56,0.28)]">
+          {/* Subtle architectural paper texture */}
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 opacity-25 [background-image:linear-gradient(rgba(10,35,56,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(10,35,56,0.03)_1px,transparent_1px)] [background-size:32px_32px]"
+          />
+
+          {/* Mobile Drag Indicator Bar */}
+          <div
+            aria-hidden="true"
+            className="mx-auto -mt-1 mb-3.5 h-1 w-11 rounded-full bg-navy/20 sm:hidden"
+          />
+
+          {/* Close Button "X" */}
+          <button
+            type="button"
+            onClick={handleDismiss}
+            aria-label="Close event popup"
+            className="group absolute right-3.5 top-3.5 sm:right-4 sm:top-4 flex size-8 items-center justify-center rounded-full text-navy/50 transition hover:bg-navy/10 hover:text-navy cursor-pointer"
+          >
+            <svg
+              className="size-4.5 transition-transform duration-200 group-hover:scale-110"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
+
+          {/* Top Eyebrow & Multiple Events Switcher */}
+          <div className="relative pr-8 flex items-center justify-between gap-2">
+            <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#B8860B]">
+              {kicker}
+            </span>
+
+            {/* If multiple nearby events exist, show a sleek switcher */}
+            {totalEvents > 1 ? (
+              <div className="flex items-center gap-1.5 rounded-full border border-navy/15 bg-white/70 px-2.5 py-0.5 text-[10px] font-semibold text-navy/70 shadow-2xs">
+                <span>
+                  {currentIndex + 1} of {totalEvents} nearby
+                </span>
+                <div className="flex items-center gap-0.5 ml-0.5">
+                  <button
+                    type="button"
+                    onClick={handlePrevEvent}
+                    className="size-4 rounded flex items-center justify-center text-navy/70 hover:bg-navy/10 hover:text-navy transition cursor-pointer"
+                    title="Previous nearby event"
+                  >
+                    ‹
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleNextEvent}
+                    className="size-4 rounded flex items-center justify-center text-navy/70 hover:bg-navy/10 hover:text-navy transition cursor-pointer"
+                    title="Next nearby event"
+                  >
+                    ›
+                  </button>
+                </div>
+              </div>
+            ) : null}
+          </div>
+
+          {/* Main Title */}
+          <h3 className="relative mt-2 font-display text-2xl sm:text-[26px] font-bold tracking-[-0.025em] text-navy leading-[1.12]">
+            {title}
+          </h3>
+
+          {/* Description */}
+          <p className="relative mt-2 text-xs sm:text-[13px] leading-relaxed text-ink/75 line-clamp-3">
+            {description}
+          </p>
+
+          {/* Clean Thin Divider */}
+          <div className="relative my-3.5 border-t border-navy/10" />
+
+          {/* Event Date & Time */}
+          {dateTime ? (
+            <div className="relative mb-4 flex items-center gap-2 text-xs sm:text-sm font-semibold text-navy">
+              <svg
+                className="size-4.5 text-[#B8860B] shrink-0"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                />
+              </svg>
+              <span>{dateTime}</span>
+            </div>
+          ) : null}
+
+          {/* CTA Buttons */}
+          <div className="relative flex flex-col gap-2">
+            <a
+              href={ctaLink}
+              target={ctaLink.startsWith("http") ? "_blank" : undefined}
+              rel={ctaLink.startsWith("http") ? "noopener noreferrer" : undefined}
+              onClick={() => {
+                // Keep dismiss behavior
+                if (config.displayFrequency === "every_session") {
+                  sessionStorage.setItem("hnf_event_popup_dismissed", "true");
+                }
+              }}
+              className="group relative flex w-full items-center justify-center gap-2 rounded-[4px] bg-[#B8860B] px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[#9E7309] active:scale-[0.99] cursor-pointer"
+            >
+              <span>{ctaText}</span>
+              <span
+                aria-hidden="true"
+                className="transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+              >
+                ↗
+              </span>
+            </a>
+
+            {/* Maybe later button */}
+            <button
+              type="button"
+              onClick={handleDismiss}
+              className="mt-0.5 text-center text-xs font-medium text-navy/70 underline underline-offset-4 transition hover:text-navy cursor-pointer py-1"
+            >
+              {secondaryText}
+            </button>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}

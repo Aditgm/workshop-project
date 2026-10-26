@@ -67,6 +67,26 @@ export async function saveSiteContentAction(
     ];
   }
 
+  const eventPopupEnabled =
+    formData.get("eventPopupEnabled") === "on" ||
+    formData.get("eventPopupEnabled") === "true";
+
+  const rawDelay = parseFloat(getString(formData, "eventPopupDelaySeconds"));
+  const delaySeconds =
+    !isNaN(rawDelay) && rawDelay >= 0 ? Math.min(Math.max(rawDelay, 0), 60) : 1.5;
+
+  const rawMode = getString(formData, "eventPopupMode");
+  const mode =
+    rawMode === "first_active" || rawMode === "custom"
+      ? rawMode
+      : "all_active";
+
+  const rawFreq = getString(formData, "eventPopupDisplayFrequency");
+  const displayFrequency =
+    rawFreq === "always" || rawFreq === "once_a_day"
+      ? rawFreq
+      : "every_session";
+
   const parsed = siteContentSchema.safeParse({
     home: {
       kicker: getString(formData, "homeKicker"),
@@ -90,6 +110,19 @@ export async function saveSiteContentAction(
     },
     dailyWorkshops: workshops,
     dailyWorkshop: workshops[0],
+    eventPopup: {
+      enabled: eventPopupEnabled,
+      kicker: getString(formData, "eventPopupKicker") || "HAPPENING TODAY",
+      title: getString(formData, "eventPopupTitle"),
+      description: getString(formData, "eventPopupDescription"),
+      dateTime: getString(formData, "eventPopupDateTime"),
+      ctaText: getString(formData, "eventPopupCtaText") || "Register for free",
+      ctaLink: getString(formData, "eventPopupCtaLink") || "https://meet.google.com",
+      secondaryText: getString(formData, "eventPopupSecondaryText") || "Maybe later",
+      delaySeconds,
+      mode,
+      displayFrequency,
+    },
     consultancy: {
       calendlyUrl: getString(formData, "consultancyCalendlyUrl"),
       headline: getString(formData, "consultancyHeadline"),

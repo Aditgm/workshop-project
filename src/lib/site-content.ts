@@ -47,6 +47,22 @@ export const workshopItemSchema = z.object({
 
 export type WorkshopItem = z.infer<typeof workshopItemSchema>;
 
+export const eventPopupSchema = z.object({
+  enabled: z.boolean(),
+  kicker: z.string().trim().max(120),
+  title: z.string().trim().max(250),
+  description: z.string().trim().max(2000),
+  dateTime: z.string().trim().max(150),
+  ctaText: z.string().trim().max(100),
+  ctaLink: z.string().trim().max(1000),
+  secondaryText: z.string().trim().max(100),
+  delaySeconds: z.number().min(0).max(60),
+  mode: z.enum(["all_active", "first_active", "custom"]),
+  displayFrequency: z.enum(["every_session", "always", "once_a_day"]),
+});
+
+export type EventPopupConfig = z.infer<typeof eventPopupSchema>;
+
 export const siteContentSchema = z.object({
   home: z.object({
     kicker: z.string().trim().min(1).max(120),
@@ -70,6 +86,7 @@ export const siteContentSchema = z.object({
   }),
   dailyWorkshops: z.array(workshopItemSchema).max(30),
   dailyWorkshop: workshopItemSchema,
+  eventPopup: eventPopupSchema,
   consultancy: z.object({
     calendlyUrl: z.string().trim().max(1000),
     headline: z.string().trim().max(250),
@@ -137,6 +154,21 @@ const defaultWorkshops: WorkshopItem[] = [
   },
 ];
 
+export const defaultEventPopup: EventPopupConfig = {
+  enabled: true,
+  kicker: "HAPPENING TODAY",
+  title: "Revenue Lab: From strategy to action",
+  description:
+    "Learn one practical way to improve your sales process in this week's live session.",
+  dateTime: "Today · 6:00 PM IST",
+  ctaText: "Register for free",
+  ctaLink: "https://meet.google.com",
+  secondaryText: "Maybe later",
+  delaySeconds: 1.5,
+  mode: "all_active",
+  displayFrequency: "every_session",
+};
+
 export const defaultSiteContent: SiteContent = {
   home: {
     kicker: "Training · Advisory · Community",
@@ -172,6 +204,7 @@ export const defaultSiteContent: SiteContent = {
   },
   dailyWorkshops: defaultWorkshops,
   dailyWorkshop: defaultWorkshops[0],
+  eventPopup: defaultEventPopup,
   consultancy: {
     calendlyUrl: "https://calendly.com",
     headline: "Book a Strategic Commercial Advisory Call",

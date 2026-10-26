@@ -130,5 +130,24 @@ test("site content falls back to safe defaults and validates", () => {
     }).consultancy.calendlyUrl,
     "https://calendly.com/test-user/30min",
   );
+  assert.equal(
+    parseSiteContent({
+      eventPopup: {
+        enabled: true,
+        kicker: "SPECIAL SESSION",
+        title: "Deal Review Masterclass",
+        mode: "custom",
+      },
+    }).eventPopup.title,
+    "Deal Review Masterclass",
+  );
+  assert.equal(
+    parseSiteContent({
+      eventPopup: {
+        enabled: false,
+      },
+    }).eventPopup.enabled,
+    false,
+  );
 });
 

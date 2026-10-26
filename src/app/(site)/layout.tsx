@@ -1,8 +1,12 @@
 import type { ReactNode } from "react";
+import { getSiteContent } from "@/lib/site-content";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
+import { EventPopup } from "@/components/marketing/event-popup";
 
-export default function SiteLayout({ children }: { children: ReactNode }) {
+export default async function SiteLayout({ children }: { children: ReactNode }) {
+  const content = await getSiteContent();
+
   return (
     <>
       <a
@@ -19,6 +23,10 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
         </main>
         <SiteFooter />
       </div>
+      <EventPopup
+        config={content.eventPopup}
+        workshops={content.dailyWorkshops}
+      />
     </>
   );
 }
