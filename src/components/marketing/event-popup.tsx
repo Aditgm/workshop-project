@@ -1,8 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
 import type { EventPopupConfig, WorkshopItem } from "@/lib/site-content";
+
+const emptySubscribe = () => () => {};
 
 export function EventPopup({
   config,
@@ -13,7 +15,11 @@ export function EventPopup({
   workshops?: WorkshopItem[];
   isPreview?: boolean;
 }) {
-  const [mounted, setMounted] = useState(false);
+  const isMounted = useSyncExternalStore(
+    emptySubscribe,
+    () => true,
+    () => false,
+  );
   const [isOpen, setIsOpen] = useState(isPreview);
   const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -72,14 +78,7 @@ export function EventPopup({
 
   // Trigger popup on every page refresh/load
   useEffect(() => {
-    setMounted(true);
-
-    if (isPreview) {
-      setIsOpen(true);
-      return;
-    }
-
-    if (!config.enabled) {
+    if (isPreview || !config.enabled) {
       return;
     }
 
@@ -124,7 +123,7 @@ export function EventPopup({
   };
 
   // If not mounted yet (SSR hydration), render nothing
-  if (!mounted) {
+  if (!isMounted) {
     return null;
   }
 

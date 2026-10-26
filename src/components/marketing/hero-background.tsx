@@ -39,7 +39,6 @@ export function HeroBackground() {
           type="image/webp"
         />
         <source srcSet="/hero-poster.webp" type="image/webp" />
-        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="/hero-poster.png"
           alt=""
