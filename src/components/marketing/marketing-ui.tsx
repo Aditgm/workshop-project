@@ -2,32 +2,32 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 
 export const marketingContainer =
-  "mx-auto w-full max-w-[1280px] px-5 sm:px-8";
+  "mx-auto w-full max-w-[1280px] px-4 sm:px-8";
 
-export const marketingSection = "py-20 sm:py-28";
+export const marketingSection = "py-14 sm:py-24 lg:py-28";
 
 export const marketingEyebrow =
-  "text-[11px] font-semibold uppercase tracking-[0.26em] text-gold";
+  "text-[10px] sm:text-[11px] font-semibold uppercase tracking-[0.24em] text-gold";
 
 export const marketingDisplay =
-  "font-display text-balance text-5xl leading-[0.98] tracking-[-0.035em] text-navy sm:text-6xl lg:text-7xl";
+  "font-display text-balance text-4xl leading-[1.04] tracking-[-0.035em] text-navy sm:text-6xl lg:text-7xl";
 
 export const marketingSectionTitle =
-  "font-display text-balance text-4xl leading-[1.02] tracking-[-0.03em] text-navy sm:text-5xl";
+  "font-display text-balance text-3xl leading-[1.06] tracking-[-0.03em] text-navy sm:text-5xl";
 
-export const marketingBody = "text-base leading-7 text-ink/70 sm:text-lg sm:leading-8";
+export const marketingBody = "text-sm sm:text-base leading-relaxed sm:leading-7 text-ink/70 sm:text-lg sm:leading-8";
 
 export const primaryButton =
-  "inline-flex min-h-11 items-center justify-center gap-3 rounded-[2px] border border-navy bg-navy px-5 py-3 text-sm font-semibold tracking-[0.01em] text-cream transition-[background-color,border-color,color,transform] duration-200 hover:-translate-y-0.5 hover:border-navy-deep hover:bg-navy-deep focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold active:translate-y-0 motion-reduce:transform-none";
+  "inline-flex min-h-12 sm:min-h-11 items-center justify-center gap-3 rounded-[2px] border border-navy bg-navy px-5 py-3 text-sm font-semibold tracking-[0.01em] text-cream transition-[background-color,border-color,color,transform] duration-200 hover:-translate-y-0.5 hover:border-navy-deep hover:bg-navy-deep focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold active:scale-[0.98] motion-reduce:transform-none select-none";
 
 export const primaryButtonOnDark =
-  "inline-flex min-h-11 items-center justify-center gap-3 rounded-[2px] border border-gold bg-gold px-5 py-3 text-sm font-semibold tracking-[0.01em] text-navy-deep transition-[background-color,border-color,color,transform] duration-200 hover:-translate-y-0.5 hover:border-gold-soft hover:bg-gold-soft focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cream active:translate-y-0 motion-reduce:transform-none";
+  "inline-flex min-h-12 sm:min-h-11 items-center justify-center gap-3 rounded-[2px] border border-gold bg-gold px-5 py-3 text-sm font-semibold tracking-[0.01em] text-navy-deep transition-[background-color,border-color,color,transform] duration-200 hover:-translate-y-0.5 hover:border-gold-soft hover:bg-gold-soft focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cream active:scale-[0.98] motion-reduce:transform-none select-none";
 
 export const secondaryButton =
-  "inline-flex min-h-11 items-center justify-center gap-3 rounded-[2px] border border-navy/25 bg-transparent px-5 py-3 text-sm font-semibold tracking-[0.01em] text-navy transition-[background-color,border-color,color,transform] duration-200 hover:-translate-y-0.5 hover:border-navy/50 hover:bg-navy/[0.04] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold active:translate-y-0 motion-reduce:transform-none";
+  "inline-flex min-h-12 sm:min-h-11 items-center justify-center gap-3 rounded-[2px] border border-navy/25 bg-transparent px-5 py-3 text-sm font-semibold tracking-[0.01em] text-navy transition-[background-color,border-color,color,transform] duration-200 hover:-translate-y-0.5 hover:border-navy/50 hover:bg-navy/[0.04] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold active:scale-[0.98] motion-reduce:transform-none select-none";
 
 export const secondaryButtonOnDark =
-  "inline-flex min-h-11 items-center justify-center gap-3 rounded-[2px] border border-cream/25 bg-transparent px-5 py-3 text-sm font-semibold tracking-[0.01em] text-cream transition-[background-color,border-color,color,transform] duration-200 hover:-translate-y-0.5 hover:border-cream/55 hover:bg-cream/[0.06] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold active:translate-y-0 motion-reduce:transform-none";
+  "inline-flex min-h-12 sm:min-h-11 items-center justify-center gap-3 rounded-[2px] border border-cream/25 bg-transparent px-5 py-3 text-sm font-semibold tracking-[0.01em] text-cream transition-[background-color,border-color,color,transform] duration-200 hover:-translate-y-0.5 hover:border-cream/55 hover:bg-cream/[0.06] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold active:scale-[0.98] motion-reduce:transform-none select-none";
 
 export const fieldLabel = "mb-2 block text-sm font-semibold text-navy";
 

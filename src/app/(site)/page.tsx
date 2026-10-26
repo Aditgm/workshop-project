@@ -81,7 +81,7 @@ export default async function HomePage() {
           className="pointer-events-none absolute -right-8 top-16 size-[24rem] rounded-full border border-gold/[0.07]"
         />
 
-        <Container className="relative flex min-h-[38rem] flex-col justify-center py-20 sm:min-h-[43rem] sm:py-24 lg:min-h-[46rem]">
+        <Container className="relative flex min-h-[calc(100dvh-4rem)] sm:min-h-[43rem] lg:min-h-[46rem] flex-col justify-center py-12 sm:py-24">
           <div className="max-w-3xl">
             <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-gold-soft">
               <span className="text-cream/35">01</span>
@@ -91,30 +91,30 @@ export default async function HomePage() {
               />
               <span>{content.home.kicker}</span>
             </div>
-            <h1 className="mt-7 max-w-4xl text-balance font-display text-5xl leading-[0.96] tracking-[-0.04em] text-cream sm:text-6xl lg:text-7xl">
+            <h1 className="mt-5 sm:mt-7 max-w-4xl text-balance font-display text-4xl sm:text-6xl lg:text-7xl leading-[1.04] sm:leading-[0.96] tracking-[-0.04em] text-cream">
               {content.home.title}
             </h1>
-            <p className="mt-7 max-w-2xl text-base leading-7 text-cream/65 sm:text-lg sm:leading-8">
+            <p className="mt-5 sm:mt-7 max-w-2xl text-sm sm:text-lg leading-relaxed sm:leading-8 text-cream/70">
               {content.home.intro}
             </p>
-            <div className="mt-10 flex flex-col gap-3 sm:flex-row">
-              <Link href="/apply" className={primaryButtonOnDark}>
+            <div className="mt-8 sm:mt-10 flex flex-col gap-3 sm:flex-row">
+              <Link href="/apply" className={`${primaryButtonOnDark} w-full sm:w-auto text-center justify-center`}>
                 Apply to First Quota
                 <ArrowUpRight />
               </Link>
-              <Link href="/programs" className={secondaryButtonOnDark}>
+              <Link href="/programs" className={`${secondaryButtonOnDark} w-full sm:w-auto text-center justify-center`}>
                 Explore programmes
               </Link>
             </div>
 
-            <div className="mt-16 grid max-w-2xl gap-4 border-t border-cream/20 pt-6 sm:grid-cols-3">
+            <div className="mt-12 sm:mt-16 grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4 border-t border-cream/20 pt-6">
               <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-cream/50">
                 Six-week cohort
               </p>
               <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-cream/50">
                 Live online
               </p>
-              <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-cream/50">
+              <p className="col-span-2 sm:col-span-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-cream/50">
                 Revenue Lab · Free weekly
               </p>
             </div>

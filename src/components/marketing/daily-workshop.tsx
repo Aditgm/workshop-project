@@ -93,15 +93,15 @@ export function DailyWorkshopSection({
               ) : null}
             </div>
 
-            <h2 className="mt-4 font-display text-4xl leading-[1.02] tracking-[-0.03em] text-navy sm:text-5xl lg:text-6xl max-w-3xl">
+            <h2 className="mt-3 sm:mt-4 font-display text-3xl sm:text-5xl lg:text-6xl leading-[1.06] sm:leading-[1.02] tracking-[-0.03em] text-navy max-w-3xl">
               {currentWorkshop.title || "Daily Commercial Workshop"}
             </h2>
           </div>
 
           {/* Time & Rhythm tags */}
-          <div className="flex flex-wrap items-center gap-2.5 text-xs font-semibold uppercase tracking-[0.14em] text-navy/75">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-2.5 text-xs font-semibold uppercase tracking-[0.14em] text-navy/75">
             {currentWorkshop.date ? (
-              <span className="inline-flex items-center gap-1.5 rounded-[2px] border border-navy/20 bg-cream px-3 py-1.5 shadow-xs">
+              <span className="inline-flex items-center gap-1.5 rounded-[2px] border border-navy/20 bg-cream px-2.5 sm:px-3 py-1.5 shadow-xs text-[11px] sm:text-xs">
                 <svg className="size-3.5 text-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
@@ -109,7 +109,7 @@ export function DailyWorkshopSection({
               </span>
             ) : null}
             {currentWorkshop.time ? (
-              <span className="inline-flex items-center gap-1.5 rounded-[2px] border border-navy/20 bg-cream px-3 py-1.5 shadow-xs">
+              <span className="inline-flex items-center gap-1.5 rounded-[2px] border border-navy/20 bg-cream px-2.5 sm:px-3 py-1.5 shadow-xs text-[11px] sm:text-xs">
                 <svg className="size-3.5 text-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
@@ -121,11 +121,11 @@ export function DailyWorkshopSection({
 
         {/* Multiple Workshops Tab Bar if 2 or more workshops exist */}
         {activeList.length > 1 ? (
-          <div className="mt-8 border-b border-navy/15 pb-4">
-            <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.2em] text-navy/40">
+          <div className="mt-6 sm:mt-8 border-b border-navy/15 pb-4">
+            <p className="mb-2.5 sm:mb-3 text-[10px] font-semibold uppercase tracking-[0.2em] text-navy/40">
               Select a workshop session:
             </p>
-            <div className="flex flex-wrap gap-2.5">
+            <div className="flex overflow-x-auto pb-2 sm:flex-wrap gap-2 sm:gap-2.5 -mx-4 px-4 sm:mx-0 sm:px-0 scrollbar-none overscroll-x-contain snap-x snap-mandatory">
               {activeList.map((item, idx) => {
                 const isCurrent = idx === activeIndex;
                 return (
@@ -133,7 +133,7 @@ export function DailyWorkshopSection({
                     key={item.id || idx}
                     type="button"
                     onClick={() => switchWorkshop(idx)}
-                    className={`group flex items-center gap-2.5 rounded-[2px] border px-4 py-2.5 text-left text-xs font-semibold transition-all ${
+                    className={`group flex shrink-0 snap-start items-center gap-2 sm:gap-2.5 rounded-[2px] border px-3 sm:px-4 py-2.5 text-left text-xs font-semibold transition-all ${
                       isCurrent
                         ? "border-navy bg-navy text-cream shadow-sm"
                         : "border-navy/15 bg-cream/80 text-navy hover:border-navy/40 hover:bg-cream"
@@ -144,7 +144,7 @@ export function DailyWorkshopSection({
                         isCurrent ? "bg-gold" : "bg-navy/30 group-hover:bg-gold"
                       }`}
                     />
-                    <span className="max-w-[220px] truncate">{item.title}</span>
+                    <span className="max-w-[190px] sm:max-w-[220px] truncate">{item.title}</span>
                     {item.badge ? (
                       <span
                         className={`text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded-[1px] ${
@@ -271,7 +271,7 @@ export function DailyWorkshopSection({
                     href={currentWorkshop.meetingLink}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={`${primaryButton} text-center`}
+                    className={`${primaryButton} w-full sm:w-auto justify-center text-center`}
                   >
                     <svg className="size-4 text-gold-soft" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
@@ -283,7 +283,7 @@ export function DailyWorkshopSection({
                   <button
                     type="button"
                     onClick={handleCopyLink}
-                    className={`${secondaryButton} text-xs`}
+                    className={`${secondaryButton} w-full sm:w-auto justify-center text-xs`}
                   >
                     {copied ? (
                       <span className="text-emerald-700 font-semibold">✓ Link Copied!</span>

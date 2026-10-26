@@ -166,7 +166,7 @@ export function EventPopup({
         }`}
         style={{ zIndex: 999999 }}
       >
-        <div className="relative w-full max-w-lg overflow-hidden rounded-t-[24px] sm:rounded-2xl border border-navy/20 bg-[#FAF7F0] p-5 sm:p-6 shadow-[0_24px_70px_rgba(10,35,56,0.36)] text-navy">
+        <div className="relative w-full max-w-lg max-h-[85dvh] overflow-y-auto overscroll-contain rounded-t-[24px] sm:rounded-2xl border border-navy/20 bg-[#FAF7F0] p-5 sm:p-6 pb-[max(1.25rem,calc(1.25rem+env(safe-area-inset-bottom,0px)))] sm:pb-6 shadow-[0_24px_70px_rgba(10,35,56,0.36)] text-navy">
           {/* Subtle architectural grain texture */}
           <div
             aria-hidden="true"

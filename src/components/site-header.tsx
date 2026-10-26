@@ -26,9 +26,9 @@ export async function SiteHeader() {
 
   return (
     <>
-      <div className="bg-navy text-cream/65">
+      <div className="hidden sm:block bg-navy text-cream/65">
         <Container className="flex min-h-9 items-center justify-between gap-6 py-2">
-          <p className="hidden text-[10px] font-medium uppercase tracking-[0.18em] sm:block">
+          <p className="text-[10px] font-medium uppercase tracking-[0.18em]">
             Practical commercial education, advisory, and community.
           </p>
           <nav
@@ -44,7 +44,7 @@ export async function SiteHeader() {
                 {link.label}
               </Link>
             ))}
-            <span aria-hidden="true" className="hidden h-3 w-px bg-cream/20 sm:block" />
+            <span aria-hidden="true" className="h-3 w-px bg-cream/20" />
             <Link
               href={portalHref}
               className="transition-colors hover:text-gold-soft"
@@ -66,7 +66,7 @@ export async function SiteHeader() {
       </div>
 
       <header className="sticky top-0 z-50 border-b border-navy/10 bg-cream/95 backdrop-blur">
-        <Container className="relative flex h-[76px] items-center justify-between gap-8">
+        <Container className="relative flex h-16 sm:h-[76px] items-center justify-between gap-4 sm:gap-8">
           <BrandMark />
 
           <nav

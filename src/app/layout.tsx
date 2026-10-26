@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Manrope, Newsreader } from "next/font/google";
 import type { ReactNode } from "react";
+import { MobileDetector } from "@/components/mobile-detector";
 import "./globals.css";
 
 const manrope = Manrope({
@@ -40,6 +41,10 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  viewportFit: "cover",
   themeColor: "#0a2338",
   colorScheme: "light",
 };
@@ -51,7 +56,10 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       data-scroll-behavior="smooth"
       className={`${manrope.variable} ${newsreader.variable} h-full antialiased`}
     >
-      <body className="min-h-full bg-cream text-ink">{children}</body>
+      <body className="min-h-full bg-cream text-ink">
+        <MobileDetector />
+        {children}
+      </body>
     </html>
   );
 }
