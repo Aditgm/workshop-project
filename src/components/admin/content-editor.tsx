@@ -926,9 +926,9 @@ export function ContentEditor({ content }: { content: SiteContent }) {
               }
               className={adminInput}
             >
-              <option value="every_session">Once per session (Normal)</option>
-              <option value="always">Every page visit (Testing)</option>
-              <option value="once_a_day">Once per 24 hours</option>
+              <option value="always">Every page refresh / load (Default & Recommended)</option>
+              <option value="once_a_day">Once per 24 hours per visitor</option>
+              <option value="every_session">Once per browser session</option>
             </select>
           </div>
         </div>

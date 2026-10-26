@@ -83,9 +83,9 @@ export async function saveSiteContentAction(
 
   const rawFreq = getString(formData, "eventPopupDisplayFrequency");
   const displayFrequency =
-    rawFreq === "always" || rawFreq === "once_a_day"
+    rawFreq === "every_session" || rawFreq === "once_a_day"
       ? rawFreq
-      : "every_session";
+      : "always";
 
   const parsed = siteContentSchema.safeParse({
     home: {

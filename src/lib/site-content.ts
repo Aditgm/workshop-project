@@ -164,9 +164,9 @@ export const defaultEventPopup: EventPopupConfig = {
   ctaText: "Register for free",
   ctaLink: "https://meet.google.com",
   secondaryText: "Maybe later",
-  delaySeconds: 1.5,
+  delaySeconds: 0.4,
   mode: "all_active",
-  displayFrequency: "every_session",
+  displayFrequency: "always",
 };
 
 export const defaultSiteContent: SiteContent = {

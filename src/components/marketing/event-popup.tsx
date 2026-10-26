@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import type { EventPopupConfig, WorkshopItem } from "@/lib/site-content";
 
 export function EventPopup({
@@ -12,14 +13,14 @@ export function EventPopup({
   workshops?: WorkshopItem[];
   isPreview?: boolean;
 }) {
+  const [mounted, setMounted] = useState(false);
   const [isOpen, setIsOpen] = useState(isPreview);
-  const [isRendered, setIsRendered] = useState(isPreview);
   const [currentIndex, setCurrentIndex] = useState(0);
 
   // Filter active workshops
   const activeWorkshops = workshops.filter((w) => w.isActive);
 
-  // In preview mode or custom mode with no active workshops, ensure we have a fallback
+  // In preview mode or custom mode with no active workshops, ensure fallback
   const totalEvents =
     config.mode === "custom"
       ? 1
@@ -30,8 +31,7 @@ export function EventPopup({
         : 1;
 
   // Resolve current event details
-  const hasWorkshop =
-    config.mode !== "custom" && activeWorkshops.length > 0;
+  const hasWorkshop = config.mode !== "custom" && activeWorkshops.length > 0;
   const currentWorkshop = hasWorkshop
     ? activeWorkshops[currentIndex] || activeWorkshops[0]
     : null;
@@ -70,10 +70,11 @@ export function EventPopup({
   const ctaText = config.ctaText || "Register for free";
   const secondaryText = config.secondaryText || "Maybe later";
 
-  // Check display rules on mount (client-side only)
+  // Trigger popup on every page refresh/load
   useEffect(() => {
+    setMounted(true);
+
     if (isPreview) {
-      setIsRendered(true);
       setIsOpen(true);
       return;
     }
@@ -82,27 +83,18 @@ export function EventPopup({
       return;
     }
 
-    // Check frequency dismissal
-    if (config.displayFrequency === "every_session") {
-      const dismissed = sessionStorage.getItem("hnf_event_popup_dismissed");
-      if (dismissed === "true") return;
-    } else if (config.displayFrequency === "once_a_day") {
-      const dismissedUntil = localStorage.getItem(
-        "hnf_event_popup_dismissed_until",
-      );
+    // Only skip if explicitly set to once_a_day in admin panel
+    if (config.displayFrequency === "once_a_day") {
+      const dismissedUntil = localStorage.getItem("hnf_event_popup_dismissed_until");
       if (dismissedUntil && Number(dismissedUntil) > Date.now()) {
         return;
       }
     }
 
-    // Wait for delay
-    const delayMs = Math.max(config.delaySeconds || 1.5, 0.2) * 1000;
+    // Pop up promptly on every refresh
+    const delayMs = Math.max(config.delaySeconds ?? 0.4, 0.1) * 1000;
     const timer = setTimeout(() => {
-      setIsRendered(true);
-      // Small tick for CSS transition
-      requestAnimationFrame(() => {
-        setIsOpen(true);
-      });
+      setIsOpen(true);
     }, delayMs);
 
     return () => clearTimeout(timer);
@@ -110,20 +102,10 @@ export function EventPopup({
 
   const handleDismiss = () => {
     setIsOpen(false);
-    setTimeout(() => {
-      setIsRendered(false);
-    }, 450);
 
-    if (!isPreview) {
-      if (config.displayFrequency === "every_session") {
-        sessionStorage.setItem("hnf_event_popup_dismissed", "true");
-      } else if (config.displayFrequency === "once_a_day") {
-        const expires = Date.now() + 24 * 60 * 60 * 1000;
-        localStorage.setItem(
-          "hnf_event_popup_dismissed_until",
-          expires.toString(),
-        );
-      }
+    if (!isPreview && config.displayFrequency === "once_a_day") {
+      const expires = Date.now() + 24 * 60 * 60 * 1000;
+      localStorage.setItem("hnf_event_popup_dismissed_until", expires.toString());
     }
   };
 
@@ -141,34 +123,52 @@ export function EventPopup({
     }
   };
 
-  if (!isRendered) {
+  // If not mounted yet (SSR hydration), render nothing
+  if (!mounted) {
     return null;
   }
 
-  return (
-    <>
-      {/* Backdrop overlay scrim */}
+  // If in admin preview and disabled, or closed
+  if (!config.enabled && !isPreview) {
+    return null;
+  }
+
+  const popupContent = (
+    <div
+      aria-live="polite"
+      className="event-popup-root fixed inset-0 pointer-events-none"
+      style={{ zIndex: 999999 }}
+    >
+      {/* 
+        Dark Scrim Backdrop
+        Fixed to the visible viewport screen
+      */}
       <div
         onClick={handleDismiss}
         aria-hidden="true"
-        className={`fixed inset-0 z-40 bg-navy/30 backdrop-blur-[2px] transition-opacity duration-500 ease-out ${
+        className={`fixed inset-0 bg-navy/40 backdrop-blur-[2px] transition-opacity duration-500 ease-out ${
           isOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
         }`}
+        style={{ zIndex: 999998 }}
       />
 
-      {/* Floating Bottom Sheet / Popup Card */}
+      {/* 
+        Floating Bottom Sheet Popup
+        LOCKED TO ONSCREEN BOTTOM OF VIEWPORT
+      */}
       <div
         role="dialog"
         aria-modal="true"
         aria-label="Upcoming Event Announcement"
-        className={`fixed inset-x-0 bottom-0 z-50 p-2 sm:p-5 sm:inset-x-auto sm:right-6 sm:bottom-6 sm:max-w-md w-full transition-all duration-500 ease-out transform ${
+        className={`fixed inset-x-0 bottom-0 flex justify-center p-0 sm:p-5 transition-all duration-500 ease-out transform ${
           isOpen
             ? "translate-y-0 opacity-100 pointer-events-auto"
-            : "translate-y-12 opacity-0 pointer-events-none"
+            : "translate-y-full opacity-0 pointer-events-none"
         }`}
+        style={{ zIndex: 999999 }}
       >
-        <div className="relative overflow-hidden rounded-t-[22px] sm:rounded-2xl border border-navy/15 bg-[#FAF7F0] p-5 sm:p-6 shadow-[0_20px_50px_rgba(10,35,56,0.28)]">
-          {/* Subtle architectural paper texture */}
+        <div className="relative w-full max-w-lg overflow-hidden rounded-t-[24px] sm:rounded-2xl border border-navy/20 bg-[#FAF7F0] p-5 sm:p-6 shadow-[0_24px_70px_rgba(10,35,56,0.36)] text-navy">
+          {/* Subtle architectural grain texture */}
           <div
             aria-hidden="true"
             className="pointer-events-none absolute inset-0 opacity-25 [background-image:linear-gradient(rgba(10,35,56,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(10,35,56,0.03)_1px,transparent_1px)] [background-size:32px_32px]"
@@ -177,7 +177,7 @@ export function EventPopup({
           {/* Mobile Drag Indicator Bar */}
           <div
             aria-hidden="true"
-            className="mx-auto -mt-1 mb-3.5 h-1 w-11 rounded-full bg-navy/20 sm:hidden"
+            className="mx-auto -mt-1 mb-3.5 h-1.5 w-12 rounded-full bg-navy/20 sm:hidden"
           />
 
           {/* Close Button "X" */}
@@ -208,9 +208,9 @@ export function EventPopup({
               {kicker}
             </span>
 
-            {/* If multiple nearby events exist, show a sleek switcher */}
+            {/* If multiple nearby events exist, show switcher */}
             {totalEvents > 1 ? (
-              <div className="flex items-center gap-1.5 rounded-full border border-navy/15 bg-white/70 px-2.5 py-0.5 text-[10px] font-semibold text-navy/70 shadow-2xs">
+              <div className="flex items-center gap-1.5 rounded-full border border-navy/15 bg-white/80 px-2.5 py-0.5 text-[10px] font-semibold text-navy/80 shadow-2xs">
                 <span>
                   {currentIndex + 1} of {totalEvents} nearby
                 </span>
@@ -237,7 +237,7 @@ export function EventPopup({
           </div>
 
           {/* Main Title */}
-          <h3 className="relative mt-2 font-display text-2xl sm:text-[26px] font-bold tracking-[-0.025em] text-navy leading-[1.12]">
+          <h3 className="relative mt-2 font-display text-2xl sm:text-[26px] font-bold tracking-[-0.025em] text-navy leading-[1.14]">
             {title}
           </h3>
 
@@ -275,12 +275,6 @@ export function EventPopup({
               href={ctaLink}
               target={ctaLink.startsWith("http") ? "_blank" : undefined}
               rel={ctaLink.startsWith("http") ? "noopener noreferrer" : undefined}
-              onClick={() => {
-                // Keep dismiss behavior
-                if (config.displayFrequency === "every_session") {
-                  sessionStorage.setItem("hnf_event_popup_dismissed", "true");
-                }
-              }}
               className="group relative flex w-full items-center justify-center gap-2 rounded-[4px] bg-[#B8860B] px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[#9E7309] active:scale-[0.99] cursor-pointer"
             >
               <span>{ctaText}</span>
@@ -303,6 +297,9 @@ export function EventPopup({
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
+
+  // Portal directly to document.body so no parent container can ever restrict or misplace it
+  return createPortal(popupContent, document.body);
 }
