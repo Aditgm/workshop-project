@@ -263,12 +263,45 @@ export function ContentEditor({ content }: { content: SiteContent }) {
   const [showLivePreview, setShowLivePreview] = useState(false);
 
   const [eventPopup, setEventPopup] = useState<EventPopupConfig>(() => {
-    return content.eventPopup || defaultEventPopup;
+    const raw = content.eventPopup || defaultEventPopup;
+    return {
+      ...defaultEventPopup,
+      ...raw,
+      selectedWorkshopIds:
+        Array.isArray(raw.selectedWorkshopIds) && raw.selectedWorkshopIds.length > 0
+          ? raw.selectedWorkshopIds
+          : workshops.filter((w) => w.isActive).map((w) => w.id),
+    };
   });
   const [showPopupModalPreview, setShowPopupModalPreview] = useState(false);
 
   const updateEventPopup = (field: keyof EventPopupConfig, value: unknown) => {
     setEventPopup((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const toggleWorkshopInPopup = (workshopId: string) => {
+    setEventPopup((prev) => {
+      const current = prev.selectedWorkshopIds || [];
+      const isCurrentlyIncluded = current.includes(workshopId);
+      const updated = isCurrentlyIncluded
+        ? current.filter((id) => id !== workshopId)
+        : [...current, workshopId];
+      return { ...prev, selectedWorkshopIds: updated };
+    });
+  };
+
+  const keepAllWorkshopsInPopup = () => {
+    setEventPopup((prev) => ({
+      ...prev,
+      selectedWorkshopIds: workshops.filter((w) => w.isActive).map((w) => w.id),
+    }));
+  };
+
+  const removeAllWorkshopsFromPopup = () => {
+    setEventPopup((prev) => ({
+      ...prev,
+      selectedWorkshopIds: [],
+    }));
   };
 
   const currentWorkshop =
@@ -680,6 +713,51 @@ export function ContentEditor({ content }: { content: SiteContent }) {
           name="eventPopupDisplayFrequency"
           value={eventPopup.displayFrequency}
         />
+        <input
+          type="hidden"
+          name="eventPopupShowKicker"
+          value={eventPopup.showKicker !== false ? "true" : "false"}
+        />
+        <input
+          type="hidden"
+          name="eventPopupShowDateTime"
+          value={eventPopup.showDateTime !== false ? "true" : "false"}
+        />
+        <input
+          type="hidden"
+          name="eventPopupShowDescription"
+          value={eventPopup.showDescription !== false ? "true" : "false"}
+        />
+        <input
+          type="hidden"
+          name="eventPopupShowImage"
+          value={eventPopup.showImage !== false ? "true" : "false"}
+        />
+        <input
+          type="hidden"
+          name="eventPopupShowSecondaryCta"
+          value={eventPopup.showSecondaryCta !== false ? "true" : "false"}
+        />
+        <input
+          type="hidden"
+          name="eventPopupShowCounter"
+          value={eventPopup.showCounter !== false ? "true" : "false"}
+        />
+        <input
+          type="hidden"
+          name="eventPopupBackdropBlur"
+          value={eventPopup.backdropBlur !== false ? "true" : "false"}
+        />
+        <input
+          type="hidden"
+          name="eventPopupPosition"
+          value={eventPopup.position || "bottom_sheet"}
+        />
+        <input
+          type="hidden"
+          name="eventPopupSelectedWorkshopIds"
+          value={JSON.stringify(eventPopup.selectedWorkshopIds || [])}
+        />
 
         {/* Master Enabled Toggle */}
         <div className="flex flex-wrap items-center justify-between gap-4 rounded-[2px] border border-cream/15 bg-cream/[0.03] p-4 sm:p-5">
@@ -717,7 +795,7 @@ export function ContentEditor({ content }: { content: SiteContent }) {
         {/* Display Mode Selection */}
         <div>
           <label className={adminLabel}>Event Display Mode</label>
-          <div className="grid gap-3 sm:grid-cols-3">
+          <div className="grid gap-3 sm:grid-cols-4">
             <button
               type="button"
               onClick={() => updateEventPopup("mode", "all_active")}
@@ -729,12 +807,32 @@ export function ContentEditor({ content }: { content: SiteContent }) {
             >
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold text-gold-soft uppercase tracking-wider">
-                  All Nearby Events
+                  All Events
                 </span>
                 <span className="text-[10px] text-emerald-400 font-semibold">Recommended</span>
               </div>
               <p className="mt-1.5 text-xs text-cream/70 leading-5">
-                Automatically loads active workshops. If multiple events are scheduled, visitors can flip through each nearby event.
+                Automatically shows all active workshops. Visitors can browse all nearby sessions.
+              </p>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => updateEventPopup("mode", "selected")}
+              className={`rounded-[2px] border p-4 text-left transition cursor-pointer ${
+                eventPopup.mode === "selected"
+                  ? "border-gold bg-gold/10 text-cream ring-1 ring-gold/40"
+                  : "border-cream/15 bg-cream/[0.02] text-cream/70 hover:border-cream/30 hover:bg-cream/[0.05]"
+              }`}
+            >
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-gold-soft uppercase tracking-wider">
+                  Selected Events
+                </span>
+                <span className="text-[10px] text-gold font-semibold">Custom List</span>
+              </div>
+              <p className="mt-1.5 text-xs text-cream/70 leading-5">
+                Handpick specifically which workshops to keep or exclude from the popup rotation below.
               </p>
             </button>
 
@@ -748,7 +846,7 @@ export function ContentEditor({ content }: { content: SiteContent }) {
               }`}
             >
               <span className="text-xs font-bold text-gold-soft uppercase tracking-wider">
-                First Active Event
+                First Active
               </span>
               <p className="mt-1.5 text-xs text-cream/70 leading-5">
                 Always focuses solely on the nearest/top active workshop in your list.
@@ -765,10 +863,308 @@ export function ContentEditor({ content }: { content: SiteContent }) {
               }`}
             >
               <span className="text-xs font-bold text-gold-soft uppercase tracking-wider">
-                Custom Announcement
+                Custom Text
               </span>
               <p className="mt-1.5 text-xs text-cream/70 leading-5">
-                Disregards workshops and exclusively displays your custom headline, copy, and link below.
+                Disregards workshops and exclusively displays your custom headline, copy, and link.
+              </p>
+            </button>
+          </div>
+        </div>
+
+        {/* Keep or Remove Workshop Selector (available in all_active or selected modes) */}
+        {eventPopup.mode !== "custom" && workshops.length > 0 ? (
+          <div className="rounded-[2px] border border-cream/15 bg-cream/[0.02] p-4 sm:p-5">
+            <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+              <div>
+                <h4 className="text-sm font-semibold text-cream">
+                  Events Included in Popup Rotation ({eventPopup.mode === "selected" ? "Filtered" : "All Active"})
+                </h4>
+                <p className="text-xs text-cream/50 mt-0.5">
+                  Select which sessions to keep or remove from visitors&apos; popup carousel.
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={keepAllWorkshopsInPopup}
+                  className="rounded-[2px] border border-cream/20 bg-cream/5 px-2.5 py-1 text-xs font-medium text-cream/80 hover:bg-cream/10 hover:text-cream transition cursor-pointer"
+                >
+                  Keep All
+                </button>
+                <button
+                  type="button"
+                  onClick={removeAllWorkshopsFromPopup}
+                  className="rounded-[2px] border border-cream/20 bg-cream/5 px-2.5 py-1 text-xs font-medium text-cream/80 hover:bg-cream/10 hover:text-cream transition cursor-pointer"
+                >
+                  Clear All
+                </button>
+              </div>
+            </div>
+
+            <div className="space-y-2.5">
+              {workshops.map((w) => {
+                const isSelected =
+                  eventPopup.mode === "selected"
+                    ? (eventPopup.selectedWorkshopIds || []).includes(w.id)
+                    : eventPopup.mode === "first_active"
+                      ? w.id === workshops.find((x) => x.isActive)?.id
+                      : (eventPopup.selectedWorkshopIds || []).length === 0 ||
+                        (eventPopup.selectedWorkshopIds || []).includes(w.id);
+
+                return (
+                  <div
+                    key={w.id}
+                    className={`flex flex-wrap items-center justify-between gap-3 p-3 rounded-[2px] border transition ${
+                      isSelected
+                        ? "border-gold/40 bg-gold/[0.04]"
+                        : "border-cream/10 bg-cream/[0.01] opacity-60"
+                    }`}
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      {w.photos?.[0] ? (
+                        <div className="relative size-10 shrink-0 overflow-hidden rounded-[2px] border border-cream/15 bg-navy/20">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={w.photos[0]}
+                            alt=""
+                            className="size-full object-cover"
+                          />
+                        </div>
+                      ) : (
+                        <div className="flex size-10 shrink-0 items-center justify-center rounded-[2px] border border-cream/10 bg-cream/5 text-sm">
+                          🏛️
+                        </div>
+                      )}
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2">
+                          <p className="text-xs font-semibold text-cream truncate">
+                            {w.title || "Untitled Workshop"}
+                          </p>
+                          {w.badge ? (
+                            <span className="text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded-[1px] bg-gold/20 text-gold-soft shrink-0">
+                              {w.badge}
+                            </span>
+                          ) : null}
+                          {!w.isActive ? (
+                            <span className="text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded-[1px] bg-rose-500/20 text-rose-300 shrink-0">
+                              Inactive on site
+                            </span>
+                          ) : null}
+                        </div>
+                        <p className="text-[11px] text-cream/40 mt-0.5 truncate">
+                          {[w.date, w.time].filter(Boolean).join(" · ") || "Date not set"}
+                        </p>
+                      </div>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => toggleWorkshopInPopup(w.id)}
+                      className={`inline-flex items-center gap-1.5 rounded-[2px] px-3 py-1.5 text-xs font-semibold transition cursor-pointer ${
+                        isSelected
+                          ? "border border-emerald-500/40 bg-emerald-500/15 text-emerald-300 hover:bg-emerald-500/25"
+                          : "border border-cream/20 bg-cream/5 text-cream/50 hover:bg-cream/10 hover:text-cream/80"
+                      }`}
+                    >
+                      {isSelected ? "✓ Kept in Popup" : "✕ Excluded from Popup"}
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        ) : null}
+
+        {/* What to Show on Popup (Granular Element Visibility Toggles) */}
+        <div>
+          <label className={adminLabel}>What to Show on Popup (Element Visibility)</label>
+          <p className="text-xs text-cream/40 -mt-1.5 mb-3">
+            Customize which components and design elements appear on the popup banner.
+          </p>
+
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {/* Show Kicker */}
+            <label className="flex items-start gap-3 rounded-[2px] border border-cream/15 bg-cream/[0.02] p-3.5 hover:border-cream/30 hover:bg-cream/[0.04] transition cursor-pointer">
+              <input
+                type="checkbox"
+                checked={eventPopup.showKicker !== false}
+                onChange={(e) => updateEventPopup("showKicker", e.target.checked)}
+                className="mt-0.5 size-4 rounded border-cream/20 bg-cream/5 text-gold focus:ring-gold"
+              />
+              <div>
+                <span className="text-xs font-semibold text-cream block">
+                  🏷️ Eyebrow / Kicker Badge
+                </span>
+                <span className="text-[11px] text-cream/40 leading-4 block mt-0.5">
+                  Shows category tag (e.g. &quot;HAPPENING TODAY&quot;).
+                </span>
+              </div>
+            </label>
+
+            {/* Show Date & Time */}
+            <label className="flex items-start gap-3 rounded-[2px] border border-cream/15 bg-cream/[0.02] p-3.5 hover:border-cream/30 hover:bg-cream/[0.04] transition cursor-pointer">
+              <input
+                type="checkbox"
+                checked={eventPopup.showDateTime !== false}
+                onChange={(e) => updateEventPopup("showDateTime", e.target.checked)}
+                className="mt-0.5 size-4 rounded border-cream/20 bg-cream/5 text-gold focus:ring-gold"
+              />
+              <div>
+                <span className="text-xs font-semibold text-cream block">
+                  📅 Date &amp; Time Display
+                </span>
+                <span className="text-[11px] text-cream/40 leading-4 block mt-0.5">
+                  Shows the scheduled workshop time and day.
+                </span>
+              </div>
+            </label>
+
+            {/* Show Description */}
+            <label className="flex items-start gap-3 rounded-[2px] border border-cream/15 bg-cream/[0.02] p-3.5 hover:border-cream/30 hover:bg-cream/[0.04] transition cursor-pointer">
+              <input
+                type="checkbox"
+                checked={eventPopup.showDescription !== false}
+                onChange={(e) => updateEventPopup("showDescription", e.target.checked)}
+                className="mt-0.5 size-4 rounded border-cream/20 bg-cream/5 text-gold focus:ring-gold"
+              />
+              <div>
+                <span className="text-xs font-semibold text-cream block">
+                  📝 Event Description
+                </span>
+                <span className="text-[11px] text-cream/40 leading-4 block mt-0.5">
+                  Shows the brief session summary &amp; overview copy.
+                </span>
+              </div>
+            </label>
+
+            {/* Show Image */}
+            <label className="flex items-start gap-3 rounded-[2px] border border-cream/15 bg-cream/[0.02] p-3.5 hover:border-cream/30 hover:bg-cream/[0.04] transition cursor-pointer">
+              <input
+                type="checkbox"
+                checked={eventPopup.showImage !== false}
+                onChange={(e) => updateEventPopup("showImage", e.target.checked)}
+                className="mt-0.5 size-4 rounded border-cream/20 bg-cream/5 text-gold focus:ring-gold"
+              />
+              <div>
+                <span className="text-xs font-semibold text-cream block">
+                  🖼️ Featured Photo Banner
+                </span>
+                <span className="text-[11px] text-cream/40 leading-4 block mt-0.5">
+                  Shows the workshop photo header inside the popup.
+                </span>
+              </div>
+            </label>
+
+            {/* Show Counter */}
+            <label className="flex items-start gap-3 rounded-[2px] border border-cream/15 bg-cream/[0.02] p-3.5 hover:border-cream/30 hover:bg-cream/[0.04] transition cursor-pointer">
+              <input
+                type="checkbox"
+                checked={eventPopup.showCounter !== false}
+                onChange={(e) => updateEventPopup("showCounter", e.target.checked)}
+                className="mt-0.5 size-4 rounded border-cream/20 bg-cream/5 text-gold focus:ring-gold"
+              />
+              <div>
+                <span className="text-xs font-semibold text-cream block">
+                  🔢 Events Counter (&quot;1 of X&quot;)
+                </span>
+                <span className="text-[11px] text-cream/40 leading-4 block mt-0.5">
+                  Allows visitors to paginate through nearby sessions.
+                </span>
+              </div>
+            </label>
+
+            {/* Show Secondary CTA */}
+            <label className="flex items-start gap-3 rounded-[2px] border border-cream/15 bg-cream/[0.02] p-3.5 hover:border-cream/30 hover:bg-cream/[0.04] transition cursor-pointer">
+              <input
+                type="checkbox"
+                checked={eventPopup.showSecondaryCta !== false}
+                onChange={(e) => updateEventPopup("showSecondaryCta", e.target.checked)}
+                className="mt-0.5 size-4 rounded border-cream/20 bg-cream/5 text-gold focus:ring-gold"
+              />
+              <div>
+                <span className="text-xs font-semibold text-cream block">
+                  ↩️ Dismiss / &quot;Maybe later&quot;
+                </span>
+                <span className="text-[11px] text-cream/40 leading-4 block mt-0.5">
+                  Shows secondary dismiss button below the main CTA.
+                </span>
+              </div>
+            </label>
+
+            {/* Backdrop Blur */}
+            <label className="flex items-start gap-3 rounded-[2px] border border-cream/15 bg-cream/[0.02] p-3.5 hover:border-cream/30 hover:bg-cream/[0.04] transition cursor-pointer">
+              <input
+                type="checkbox"
+                checked={eventPopup.backdropBlur !== false}
+                onChange={(e) => updateEventPopup("backdropBlur", e.target.checked)}
+                className="mt-0.5 size-4 rounded border-cream/20 bg-cream/5 text-gold focus:ring-gold"
+              />
+              <div>
+                <span className="text-xs font-semibold text-cream block">
+                  🌫️ Background Scrim (Dim)
+                </span>
+                <span className="text-[11px] text-cream/40 leading-4 block mt-0.5">
+                  Dims background. Uncheck for non-blocking floating banner.
+                </span>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        {/* Screen Position (Desktop Docking) */}
+        <div>
+          <label className={adminLabel}>Desktop Screen Docking</label>
+          <div className="grid gap-3 sm:grid-cols-3">
+            <button
+              type="button"
+              onClick={() => updateEventPopup("position", "bottom_sheet")}
+              className={`rounded-[2px] border p-3.5 text-left transition cursor-pointer ${
+                (eventPopup.position || "bottom_sheet") === "bottom_sheet"
+                  ? "border-gold bg-gold/10 text-cream ring-1 ring-gold/40"
+                  : "border-cream/15 bg-cream/[0.02] text-cream/70 hover:border-cream/30 hover:bg-cream/[0.05]"
+              }`}
+            >
+              <span className="text-xs font-bold text-gold-soft uppercase tracking-wider">
+                📱 Bottom Sheet
+              </span>
+              <p className="mt-1 text-[11px] text-cream/60 leading-4">
+                Classic modern drawer docked at the viewport bottom.
+              </p>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => updateEventPopup("position", "bottom_right")}
+              className={`rounded-[2px] border p-3.5 text-left transition cursor-pointer ${
+                eventPopup.position === "bottom_right"
+                  ? "border-gold bg-gold/10 text-cream ring-1 ring-gold/40"
+                  : "border-cream/15 bg-cream/[0.02] text-cream/70 hover:border-cream/30 hover:bg-cream/[0.05]"
+              }`}
+            >
+              <span className="text-xs font-bold text-gold-soft uppercase tracking-wider">
+                ↘️ Bottom-Right Toast
+              </span>
+              <p className="mt-1 text-[11px] text-cream/60 leading-4">
+                Compact floating card docked in the bottom-right corner.
+              </p>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => updateEventPopup("position", "bottom_center")}
+              className={`rounded-[2px] border p-3.5 text-left transition cursor-pointer ${
+                eventPopup.position === "bottom_center"
+                  ? "border-gold bg-gold/10 text-cream ring-1 ring-gold/40"
+                  : "border-cream/15 bg-cream/[0.02] text-cream/70 hover:border-cream/30 hover:bg-cream/[0.05]"
+              }`}
+            >
+              <span className="text-xs font-bold text-gold-soft uppercase tracking-wider">
+                ⏹️ Bottom-Center Floating
+              </span>
+              <p className="mt-1 text-[11px] text-cream/60 leading-4">
+                Elevated floating modal banner centered at bottom.
               </p>
             </button>
           </div>
@@ -778,7 +1174,7 @@ export function ContentEditor({ content }: { content: SiteContent }) {
         <div className="grid gap-5 sm:grid-cols-2">
           <div>
             <label htmlFor="eventPopupKicker" className={adminLabel}>
-              Kicker / Eyebrow Text
+              Kicker / Eyebrow Text Override
             </label>
             <input
               id="eventPopupKicker"
@@ -793,7 +1189,7 @@ export function ContentEditor({ content }: { content: SiteContent }) {
 
           <div>
             <label htmlFor="eventPopupDateTime" className={adminLabel}>
-              Date & Time Display
+              Date &amp; Time Display Override
             </label>
             <input
               id="eventPopupDateTime"
@@ -809,7 +1205,7 @@ export function ContentEditor({ content }: { content: SiteContent }) {
 
         <div>
           <label htmlFor="eventPopupTitle" className={adminLabel}>
-            Headline / Event Title
+            Headline / Event Title Override
           </label>
           <input
             id="eventPopupTitle"
@@ -829,7 +1225,7 @@ export function ContentEditor({ content }: { content: SiteContent }) {
 
         <div>
           <label htmlFor="eventPopupDescription" className={adminLabel}>
-            Description / Overview
+            Description / Overview Override
           </label>
           <textarea
             id="eventPopupDescription"
@@ -865,7 +1261,7 @@ export function ContentEditor({ content }: { content: SiteContent }) {
 
           <div>
             <label htmlFor="eventPopupCtaLink" className={adminLabel}>
-              Primary Button Link (URL or Meeting Link)
+              Primary Button Link (URL or Meeting Link Override)
             </label>
             <input
               id="eventPopupCtaLink"
@@ -926,7 +1322,7 @@ export function ContentEditor({ content }: { content: SiteContent }) {
               }
               className={adminInput}
             >
-              <option value="always">Every page refresh / load (Default & Recommended)</option>
+              <option value="always">Every page refresh / load (Default &amp; Recommended)</option>
               <option value="once_a_day">Once per 24 hours per visitor</option>
               <option value="every_session">Once per browser session</option>
             </select>
@@ -939,18 +1335,45 @@ export function ContentEditor({ content }: { content: SiteContent }) {
             <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-gold-soft">
               Interactive Live Preview
             </p>
-            <span className="text-[10px] text-cream/40">
-              Matches mobile bottom sheet & desktop banner
-            </span>
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] text-gold uppercase tracking-wider px-2 py-0.5 rounded bg-gold/10 border border-gold/20">
+                Docking: {eventPopup.position || "bottom_sheet"}
+              </span>
+              <span className="text-[10px] text-cream/40">
+                Updates in real-time
+              </span>
+            </div>
           </div>
 
           <div className="max-w-md mx-auto rounded-2xl border border-gold/30 bg-[#FAF7F0] p-5 shadow-xl text-navy relative overflow-hidden">
             <div className="mx-auto -mt-1 mb-3 h-1 w-11 rounded-full bg-navy/20" />
+
+            {/* Preview Workshop Photo Banner */}
+            {eventPopup.showImage !== false && currentWorkshop.photos?.[0] ? (
+              <div className="relative mb-3 h-24 w-full overflow-hidden rounded-[6px] border border-navy/15 bg-navy/5 shadow-2xs">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={currentWorkshop.photos[0]}
+                  alt=""
+                  className="size-full object-cover"
+                />
+                <div
+                  aria-hidden="true"
+                  className="absolute inset-0 bg-gradient-to-t from-navy/50 via-transparent to-transparent"
+                />
+              </div>
+            ) : null}
+
             <div className="flex items-center justify-between gap-2">
-              <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#B8860B]">
-                {eventPopup.kicker || "HAPPENING TODAY"}
-              </span>
-              {eventPopup.mode === "all_active" && workshops.filter((w) => w.isActive).length > 1 ? (
+              {eventPopup.showKicker !== false ? (
+                <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#B8860B]">
+                  {eventPopup.kicker || "HAPPENING TODAY"}
+                </span>
+              ) : <span />}
+
+              {eventPopup.showCounter !== false &&
+              eventPopup.mode !== "custom" &&
+              workshops.filter((w) => w.isActive).length > 1 ? (
                 <span className="rounded-full border border-navy/15 bg-white/70 px-2 py-0.5 text-[9px] font-semibold text-navy/70">
                   1 of {workshops.filter((w) => w.isActive).length} nearby
                 </span>
@@ -963,49 +1386,56 @@ export function ContentEditor({ content }: { content: SiteContent }) {
                 "Revenue Lab: From strategy to action"}
             </h4>
 
-            <p className="mt-2 text-xs leading-relaxed text-ink/75 line-clamp-3">
-              {(eventPopup.mode === "custom"
-                ? eventPopup.description
-                : currentWorkshop.description) ||
-                eventPopup.description ||
-                "Learn one practical way to improve your sales process in this week's live session."}
-            </p>
+            {eventPopup.showDescription !== false ? (
+              <p className="mt-2 text-xs leading-relaxed text-ink/75 line-clamp-3">
+                {(eventPopup.mode === "custom"
+                  ? eventPopup.description
+                  : currentWorkshop.description) ||
+                  eventPopup.description ||
+                  "Learn one practical way to improve your sales process in this week's live session."}
+              </p>
+            ) : null}
 
             <div className="my-3 border-t border-navy/10" />
 
-            <div className="mb-4 flex items-center gap-2 text-xs font-semibold text-navy">
-              <svg
-                className="size-4 text-[#B8860B]"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                />
-              </svg>
-              <span>
-                {(eventPopup.mode === "custom"
-                  ? eventPopup.dateTime
-                  : [currentWorkshop.date, currentWorkshop.time]
-                      .filter(Boolean)
-                      .join(" · ")) ||
-                  eventPopup.dateTime ||
-                  "Today · 6:00 PM IST"}
-              </span>
-            </div>
+            {eventPopup.showDateTime !== false ? (
+              <div className="mb-4 flex items-center gap-2 text-xs font-semibold text-navy">
+                <svg
+                  className="size-4 text-[#B8860B]"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                  />
+                </svg>
+                <span>
+                  {(eventPopup.mode === "custom"
+                    ? eventPopup.dateTime
+                    : [currentWorkshop.date, currentWorkshop.time]
+                        .filter(Boolean)
+                        .join(" · ")) ||
+                    eventPopup.dateTime ||
+                    "Today · 6:00 PM IST"}
+                </span>
+              </div>
+            ) : null}
 
             <div className="flex flex-col gap-2">
               <div className="flex w-full items-center justify-center gap-1.5 rounded-[4px] bg-[#B8860B] py-2.5 text-xs font-semibold text-white shadow-sm">
                 <span>{eventPopup.ctaText || "Register for free"}</span>
                 <span>↗</span>
               </div>
-              <p className="text-center text-[11px] text-navy/70 underline">
-                {eventPopup.secondaryText || "Maybe later"}
-              </p>
+
+              {eventPopup.showSecondaryCta !== false ? (
+                <p className="text-center text-[11px] text-navy/70 underline">
+                  {eventPopup.secondaryText || "Maybe later"}
+                </p>
+              ) : null}
             </div>
           </div>
         </div>

@@ -77,7 +77,9 @@ export async function saveSiteContentAction(
 
   const rawMode = getString(formData, "eventPopupMode");
   const mode =
-    rawMode === "first_active" || rawMode === "custom"
+    rawMode === "first_active" ||
+    rawMode === "custom" ||
+    rawMode === "selected"
       ? rawMode
       : "all_active";
 
@@ -86,6 +88,33 @@ export async function saveSiteContentAction(
     rawFreq === "every_session" || rawFreq === "once_a_day"
       ? rawFreq
       : "always";
+
+  const showKicker = formData.get("eventPopupShowKicker") !== "false";
+  const showDateTime = formData.get("eventPopupShowDateTime") !== "false";
+  const showDescription = formData.get("eventPopupShowDescription") !== "false";
+  const showImage = formData.get("eventPopupShowImage") !== "false";
+  const showSecondaryCta = formData.get("eventPopupShowSecondaryCta") !== "false";
+  const showCounter = formData.get("eventPopupShowCounter") !== "false";
+  const backdropBlur = formData.get("eventPopupBackdropBlur") !== "false";
+
+  const rawPosition = getString(formData, "eventPopupPosition");
+  const position =
+    rawPosition === "bottom_right" || rawPosition === "bottom_center"
+      ? rawPosition
+      : "bottom_sheet";
+
+  let selectedWorkshopIds: string[] = [];
+  try {
+    const rawIds = formData.get("eventPopupSelectedWorkshopIds");
+    if (typeof rawIds === "string" && rawIds.trim()) {
+      const parsedIds = JSON.parse(rawIds);
+      if (Array.isArray(parsedIds)) {
+        selectedWorkshopIds = parsedIds.map((id) => String(id).trim()).filter(Boolean);
+      }
+    }
+  } catch {
+    selectedWorkshopIds = [];
+  }
 
   const parsed = siteContentSchema.safeParse({
     home: {
@@ -122,6 +151,15 @@ export async function saveSiteContentAction(
       delaySeconds,
       mode,
       displayFrequency,
+      showKicker,
+      showDateTime,
+      showDescription,
+      showImage,
+      showSecondaryCta,
+      showCounter,
+      backdropBlur,
+      position,
+      selectedWorkshopIds,
     },
     consultancy: {
       calendlyUrl: getString(formData, "consultancyCalendlyUrl"),

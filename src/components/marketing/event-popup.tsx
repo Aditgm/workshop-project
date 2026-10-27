@@ -23,17 +23,28 @@ export function EventPopup({
   const [isOpen, setIsOpen] = useState(isPreview);
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  // Filter active workshops
-  const activeWorkshops = workshops.filter((w) => w.isActive);
+  // Filter active workshops according to mode
+  const rawActive = workshops.filter((w) => w.isActive);
+  let activeWorkshops = rawActive;
+  if (
+    config.mode === "selected" &&
+    Array.isArray(config.selectedWorkshopIds) &&
+    config.selectedWorkshopIds.length > 0
+  ) {
+    const filtered = rawActive.filter((w) =>
+      config.selectedWorkshopIds.includes(w.id),
+    );
+    activeWorkshops = filtered.length > 0 ? filtered : rawActive;
+  } else if (config.mode === "first_active") {
+    activeWorkshops = rawActive.slice(0, 1);
+  }
 
   // In preview mode or custom mode with no active workshops, ensure fallback
   const totalEvents =
     config.mode === "custom"
       ? 1
       : activeWorkshops.length > 0
-        ? config.mode === "first_active"
-          ? 1
-          : activeWorkshops.length
+        ? activeWorkshops.length
         : 1;
 
   // Resolve current event details
@@ -41,6 +52,8 @@ export function EventPopup({
   const currentWorkshop = hasWorkshop
     ? activeWorkshops[currentIndex] || activeWorkshops[0]
     : null;
+
+  const photo = currentWorkshop?.photos?.[0] || null;
 
   const kicker =
     currentWorkshop?.badge?.trim() || config.kicker || "HAPPENING TODAY";
@@ -75,6 +88,14 @@ export function EventPopup({
 
   const ctaText = config.ctaText || "Register for free";
   const secondaryText = config.secondaryText || "Maybe later";
+
+  const showKicker = config.showKicker !== false;
+  const showDateTime = config.showDateTime !== false;
+  const showDescription = config.showDescription !== false;
+  const showImage = config.showImage !== false && Boolean(photo);
+  const showCounter = config.showCounter !== false && totalEvents > 1;
+  const showSecondaryCta = config.showSecondaryCta !== false;
+  const backdropBlur = config.backdropBlur !== false;
 
   // Trigger popup on every page refresh/load
   useEffect(() => {
@@ -132,6 +153,14 @@ export function EventPopup({
     return null;
   }
 
+  // Desktop docking position
+  const desktopPositionClass =
+    config.position === "bottom_right"
+      ? "sm:inset-x-auto sm:right-6 sm:bottom-6 sm:max-w-md sm:justify-end"
+      : config.position === "bottom_center"
+        ? "sm:inset-x-0 sm:bottom-6 sm:flex sm:justify-center sm:max-w-lg sm:mx-auto"
+        : "inset-x-0 bottom-0 flex justify-center p-0 sm:p-5";
+
   const popupContent = (
     <div
       aria-live="polite"
@@ -139,27 +168,29 @@ export function EventPopup({
       style={{ zIndex: 999999 }}
     >
       {/* 
-        Dark Scrim Backdrop
+        Dark Scrim Backdrop (if enabled)
         Fixed to the visible viewport screen
       */}
-      <div
-        onClick={handleDismiss}
-        aria-hidden="true"
-        className={`fixed inset-0 bg-navy/40 backdrop-blur-[2px] transition-opacity duration-500 ease-out ${
-          isOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
-        }`}
-        style={{ zIndex: 999998 }}
-      />
+      {backdropBlur ? (
+        <div
+          onClick={handleDismiss}
+          aria-hidden="true"
+          className={`fixed inset-0 bg-navy/40 backdrop-blur-[2px] transition-opacity duration-500 ease-out ${
+            isOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+          }`}
+          style={{ zIndex: 999998 }}
+        />
+      ) : null}
 
       {/* 
-        Floating Bottom Sheet Popup
+        Floating Bottom Sheet / Docked Card
         LOCKED TO ONSCREEN BOTTOM OF VIEWPORT
       */}
       <div
         role="dialog"
         aria-modal="true"
         aria-label="Upcoming Event Announcement"
-        className={`fixed inset-x-0 bottom-0 flex justify-center p-0 sm:p-5 transition-all duration-500 ease-out transform ${
+        className={`fixed inset-x-0 bottom-0 ${desktopPositionClass} transition-all duration-500 ease-out transform ${
           isOpen
             ? "translate-y-0 opacity-100 pointer-events-auto"
             : "translate-y-full opacity-0 pointer-events-none"
@@ -184,7 +215,7 @@ export function EventPopup({
             type="button"
             onClick={handleDismiss}
             aria-label="Close event popup"
-            className="group absolute right-3.5 top-3.5 sm:right-4 sm:top-4 flex size-8 items-center justify-center rounded-full text-navy/50 transition hover:bg-navy/10 hover:text-navy cursor-pointer"
+            className="group absolute right-3.5 top-3.5 sm:right-4 sm:top-4 flex size-8 items-center justify-center rounded-full text-navy/50 transition hover:bg-navy/10 hover:text-navy cursor-pointer z-10"
           >
             <svg
               className="size-4.5 transition-transform duration-200 group-hover:scale-110"
@@ -201,14 +232,32 @@ export function EventPopup({
             </svg>
           </button>
 
+          {/* Optional Workshop Photo Banner */}
+          {showImage && photo ? (
+            <div className="relative mb-3.5 h-28 sm:h-32 w-full overflow-hidden rounded-[8px] border border-navy/15 bg-navy/5 shadow-2xs">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={photo}
+                alt={title}
+                className="size-full object-cover"
+              />
+              <div
+                aria-hidden="true"
+                className="absolute inset-0 bg-gradient-to-t from-navy/50 via-transparent to-transparent"
+              />
+            </div>
+          ) : null}
+
           {/* Top Eyebrow & Multiple Events Switcher */}
           <div className="relative pr-8 flex items-center justify-between gap-2">
-            <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#B8860B]">
-              {kicker}
-            </span>
+            {showKicker ? (
+              <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#B8860B]">
+                {kicker}
+              </span>
+            ) : <span />}
 
-            {/* If multiple nearby events exist, show switcher */}
-            {totalEvents > 1 ? (
+            {/* If multiple nearby events exist and counter enabled, show switcher */}
+            {showCounter ? (
               <div className="flex items-center gap-1.5 rounded-full border border-navy/15 bg-white/80 px-2.5 py-0.5 text-[10px] font-semibold text-navy/80 shadow-2xs">
                 <span>
                   {currentIndex + 1} of {totalEvents} nearby
@@ -240,16 +289,18 @@ export function EventPopup({
             {title}
           </h3>
 
-          {/* Description */}
-          <p className="relative mt-2 text-xs sm:text-[13px] leading-relaxed text-ink/75 line-clamp-3">
-            {description}
-          </p>
+          {/* Description (Optional) */}
+          {showDescription && description ? (
+            <p className="relative mt-2 text-xs sm:text-[13px] leading-relaxed text-ink/75 line-clamp-3">
+              {description}
+            </p>
+          ) : null}
 
           {/* Clean Thin Divider */}
           <div className="relative my-3.5 border-t border-navy/10" />
 
-          {/* Event Date & Time */}
-          {dateTime ? (
+          {/* Event Date & Time (Optional) */}
+          {showDateTime && dateTime ? (
             <div className="relative mb-4 flex items-center gap-2 text-xs sm:text-sm font-semibold text-navy">
               <svg
                 className="size-4.5 text-[#B8860B] shrink-0"
@@ -285,14 +336,16 @@ export function EventPopup({
               </span>
             </a>
 
-            {/* Maybe later button */}
-            <button
-              type="button"
-              onClick={handleDismiss}
-              className="mt-0.5 text-center text-xs font-medium text-navy/70 underline underline-offset-4 transition hover:text-navy cursor-pointer py-1"
-            >
-              {secondaryText}
-            </button>
+            {/* Maybe later button (Optional) */}
+            {showSecondaryCta ? (
+              <button
+                type="button"
+                onClick={handleDismiss}
+                className="mt-0.5 text-center text-xs font-medium text-navy/70 underline underline-offset-4 transition hover:text-navy cursor-pointer py-1"
+              >
+                {secondaryText}
+              </button>
+            ) : null}
           </div>
         </div>
       </div>

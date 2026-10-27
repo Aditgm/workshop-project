@@ -149,5 +149,33 @@ test("site content falls back to safe defaults and validates", () => {
     }).eventPopup.enabled,
     false,
   );
+  assert.equal(
+    parseSiteContent({
+      eventPopup: {
+        mode: "selected",
+        selectedWorkshopIds: ["ws-1", "ws-2"],
+        showImage: false,
+        position: "bottom_right",
+      },
+    }).eventPopup.position,
+    "bottom_right",
+  );
+  assert.equal(
+    parseSiteContent({
+      eventPopup: {
+        showImage: false,
+      },
+    }).eventPopup.showImage,
+    false,
+  );
+  assert.deepEqual(
+    parseSiteContent({
+      eventPopup: {
+        mode: "selected",
+        selectedWorkshopIds: ["ws-1"],
+      },
+    }).eventPopup.selectedWorkshopIds,
+    ["ws-1"],
+  );
 });
 

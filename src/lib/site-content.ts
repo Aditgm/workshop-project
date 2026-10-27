@@ -57,11 +57,23 @@ export const eventPopupSchema = z.object({
   ctaLink: z.string().trim().max(1000),
   secondaryText: z.string().trim().max(100),
   delaySeconds: z.number().min(0).max(60),
-  mode: z.enum(["all_active", "first_active", "custom"]),
+  mode: z.enum(["all_active", "selected", "first_active", "custom"]),
   displayFrequency: z.enum(["every_session", "always", "once_a_day"]),
+  showKicker: z.boolean().default(true),
+  showDateTime: z.boolean().default(true),
+  showDescription: z.boolean().default(true),
+  showImage: z.boolean().default(true),
+  showSecondaryCta: z.boolean().default(true),
+  showCounter: z.boolean().default(true),
+  backdropBlur: z.boolean().default(true),
+  position: z
+    .enum(["bottom_sheet", "bottom_right", "bottom_center"])
+    .default("bottom_sheet"),
+  selectedWorkshopIds: z.array(z.string().trim().max(100)).default([]),
 });
 
 export type EventPopupConfig = z.infer<typeof eventPopupSchema>;
+
 
 export const siteContentSchema = z.object({
   home: z.object({
@@ -167,6 +179,15 @@ export const defaultEventPopup: EventPopupConfig = {
   delaySeconds: 0.4,
   mode: "all_active",
   displayFrequency: "always",
+  showKicker: true,
+  showDateTime: true,
+  showDescription: true,
+  showImage: true,
+  showSecondaryCta: true,
+  showCounter: true,
+  backdropBlur: true,
+  position: "bottom_sheet",
+  selectedWorkshopIds: [],
 };
 
 export const defaultSiteContent: SiteContent = {
