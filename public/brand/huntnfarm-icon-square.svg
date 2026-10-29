@@ -1,0 +1,139 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="hnf-ico-19" gradientUnits="userSpaceOnUse" x1="368.798" y1="474.949" x2="692.398" y2="474.949">
+      <stop offset="0%" stop-color="#A0701B" />
+      <stop offset="50%" stop-color="#E1BB73" />
+      <stop offset="100%" stop-color="#C49642" />
+    </linearGradient>
+    <linearGradient id="hnf-ico-20" gradientUnits="userSpaceOnUse" x1="385.155" y1="377.806" x2="387.586" y2="377.806">
+      <stop offset="0%" stop-color="#A0701B" />
+      <stop offset="50%" stop-color="#E1BB73" />
+      <stop offset="100%" stop-color="#C49642" />
+    </linearGradient>
+    <linearGradient id="hnf-ico-21" gradientUnits="userSpaceOnUse" x1="392.471" y1="381.557" x2="404.307" y2="381.557">
+      <stop offset="0%" stop-color="#A0701B" />
+      <stop offset="50%" stop-color="#E1BB73" />
+      <stop offset="100%" stop-color="#C49642" />
+    </linearGradient>
+    <linearGradient id="hnf-ico-22" gradientUnits="userSpaceOnUse" x1="386.860" y1="396.616" x2="396.210" y2="396.616">
+      <stop offset="0%" stop-color="#A0701B" />
+      <stop offset="50%" stop-color="#E1BB73" />
+      <stop offset="100%" stop-color="#C49642" />
+    </linearGradient>
+    <linearGradient id="hnf-ico-23" gradientUnits="userSpaceOnUse" x1="387.195" y1="385.193" x2="389.371" y2="385.193">
+      <stop offset="0%" stop-color="#A0701B" />
+      <stop offset="50%" stop-color="#E1BB73" />
+      <stop offset="100%" stop-color="#C49642" />
+    </linearGradient>
+    <linearGradient id="hnf-ico-24" gradientUnits="userSpaceOnUse" x1="381.987" y1="434.502" x2="532.468" y2="434.502">
+      <stop offset="0%" stop-color="#A0701B" />
+      <stop offset="50%" stop-color="#E1BB73" />
+      <stop offset="100%" stop-color="#C49642" />
+    </linearGradient>
+    <linearGradient id="hnf-ico-25" gradientUnits="userSpaceOnUse" x1="578.105" y1="578.552" x2="578.105" y2="452.871">
+      <stop offset="0%" stop-color="#A0701B" />
+      <stop offset="50%" stop-color="#E1BB73" />
+      <stop offset="100%" stop-color="#C49642" />
+    </linearGradient>
+    <linearGradient id="hnf-ico-26" gradientUnits="userSpaceOnUse" x1="614.447" y1="441.107" x2="751.956" y2="441.107">
+      <stop offset="0%" stop-color="#A0701B" />
+      <stop offset="50%" stop-color="#E1BB73" />
+      <stop offset="100%" stop-color="#C49642" />
+    </linearGradient>
+    <linearGradient id="hnf-ico-27" gradientUnits="userSpaceOnUse" x1="550.672" y1="393.708" x2="672.254" y2="393.708">
+      <stop offset="0%" stop-color="#A0701B" />
+      <stop offset="50%" stop-color="#E1BB73" />
+      <stop offset="100%" stop-color="#C49642" />
+    </linearGradient>
+    <linearGradient id="hnf-ico-28" gradientUnits="userSpaceOnUse" x1="614.408" y1="499.659" x2="698.942" y2="499.659">
+      <stop offset="0%" stop-color="#A0701B" />
+      <stop offset="50%" stop-color="#E1BB73" />
+      <stop offset="100%" stop-color="#C49642" />
+    </linearGradient>
+    <linearGradient id="hnf-ico-29" gradientUnits="userSpaceOnUse" x1="391.211" y1="551.905" x2="445.052" y2="551.905">
+      <stop offset="0%" stop-color="#A0701B" />
+      <stop offset="50%" stop-color="#E1BB73" />
+      <stop offset="100%" stop-color="#C49642" />
+    </linearGradient>
+    <linearGradient id="hnf-ico-30" gradientUnits="userSpaceOnUse" x1="673.066" y1="363.117" x2="740.332" y2="363.117">
+      <stop offset="0%" stop-color="#A0701B" />
+      <stop offset="50%" stop-color="#E1BB73" />
+      <stop offset="100%" stop-color="#C49642" />
+    </linearGradient>
+    <linearGradient id="hnf-ico-31" gradientUnits="userSpaceOnUse" x1="444.516" y1="527.093" x2="445.230" y2="527.093">
+      <stop offset="0%" stop-color="#A0701B" />
+      <stop offset="50%" stop-color="#E1BB73" />
+      <stop offset="100%" stop-color="#C49642" />
+    </linearGradient>
+    <linearGradient id="hnf-ico-32" gradientUnits="userSpaceOnUse" x1="371.801" y1="370.548" x2="387.586" y2="370.548">
+      <stop offset="0%" stop-color="#A0701B" />
+      <stop offset="50%" stop-color="#E1BB73" />
+      <stop offset="100%" stop-color="#C49642" />
+    </linearGradient>
+    <linearGradient id="hnf-ico-33" gradientUnits="userSpaceOnUse" x1="392.471" y1="381.557" x2="404.307" y2="381.557">
+      <stop offset="0%" stop-color="#A0701B" />
+      <stop offset="50%" stop-color="#E1BB73" />
+      <stop offset="100%" stop-color="#C49642" />
+    </linearGradient>
+    <linearGradient id="hnf-ico-34" gradientUnits="userSpaceOnUse" x1="356.225" y1="388.931" x2="368.687" y2="388.931">
+      <stop offset="0%" stop-color="#A0701B" />
+      <stop offset="50%" stop-color="#E1BB73" />
+      <stop offset="100%" stop-color="#C49642" />
+    </linearGradient>
+    <linearGradient id="hnf-ico-35" gradientUnits="userSpaceOnUse" x1="356.432" y1="371.691" x2="366.194" y2="371.691">
+      <stop offset="0%" stop-color="#A0701B" />
+      <stop offset="50%" stop-color="#E1BB73" />
+      <stop offset="100%" stop-color="#C49642" />
+    </linearGradient>
+    <linearGradient id="hnf-ico-36" gradientUnits="userSpaceOnUse" x1="376.216" y1="354.582" x2="385.511" y2="354.582">
+      <stop offset="0%" stop-color="#A0701B" />
+      <stop offset="50%" stop-color="#E1BB73" />
+      <stop offset="100%" stop-color="#C49642" />
+    </linearGradient>
+    <linearGradient id="hnf-ico-37" gradientUnits="userSpaceOnUse" x1="392.806" y1="365.097" x2="399.453" y2="365.097">
+      <stop offset="0%" stop-color="#A0701B" />
+      <stop offset="50%" stop-color="#E1BB73" />
+      <stop offset="100%" stop-color="#C49642" />
+    </linearGradient>
+    <linearGradient id="hnf-ico-38" gradientUnits="userSpaceOnUse" x1="363.365" y1="359.489" x2="368.142" y2="359.489">
+      <stop offset="0%" stop-color="#A0701B" />
+      <stop offset="50%" stop-color="#E1BB73" />
+      <stop offset="100%" stop-color="#C49642" />
+    </linearGradient>
+    <linearGradient id="hnf-ico-39" gradientUnits="userSpaceOnUse" x1="375.580" y1="387.228" x2="384.378" y2="387.228">
+      <stop offset="0%" stop-color="#A0701B" />
+      <stop offset="50%" stop-color="#E1BB73" />
+      <stop offset="100%" stop-color="#C49642" />
+    </linearGradient>
+    <linearGradient id="hnf-ico-40" gradientUnits="userSpaceOnUse" x1="372.672" y1="400.614" x2="377.839" y2="400.614">
+      <stop offset="0%" stop-color="#A0701B" />
+      <stop offset="50%" stop-color="#E1BB73" />
+      <stop offset="100%" stop-color="#C49642" />
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="#0a2338" />
+  <g transform="translate(256, 256) scale(0.96025) translate(-554.090, -457.839)">
+    <path d="M 680.057 377.571 C 662.930 387.880 645.391 396.654 626.732 404.135 L 626.732 404.135 L 551.578 434.267 L 513.562 449.569 C 497.855 455.891 482.998 462.609 467.770 470.025 L 467.770 470.025 C 441.831 482.657 417.925 498.327 398.435 519.712 L 398.435 519.712 C 383.642 535.941 371.029 557.621 368.797 580.322 L 368.797 580.322 L 391.211 580.379 L 399.122 568.546 C 412.107 551.188 427.716 536.317 444.823 523.430 L 444.823 523.430 C 459.534 512.348 475.306 502.901 491.918 494.168 L 491.918 494.168 C 511.174 484.048 530.546 475.571 550.282 466.388 L 550.282 466.388 L 608.175 439.450 L 631.973 426.639 C 654.544 414.487 681.462 392.815 692.399 369.519 L 692.399 369.519 Z" fill="url(#hnf-ico-19)" />
+    <path d="M 385.156 378.441 L 387.586 378.441 L 387.586 377.170 Z" fill="url(#hnf-ico-20)" />
+    <path d="M 392.471 375.638 h 11.836 v 11.836 h -11.836 Z" fill="url(#hnf-ico-21)" />
+    <path d="M 386.861 391.944 h 9.349 v 9.344 h -9.349 Z" fill="url(#hnf-ico-22)" />
+    <path d="M 387.195 381.541 h 2.176 v 7.304 h -2.176 Z" fill="url(#hnf-ico-23)" />
+    <path d="M 396.445 372.539 L 407.408 372.539 L 407.408 390.575 L 399.310 390.575 L 399.310 404.388 L 383.761 404.388 L 383.761 394.406 L 381.987 394.406 L 382.099 522.591 C 395.565 504.010 411.940 489.577 430.781 477.666 L 430.781 477.666 C 462.271 457.280 496.917 444.446 532.468 431.277 L 532.468 431.277 C 506.335 430.099 480.245 432.716 457.200 444.551 L 457.200 444.551 L 446.393 450.088 L 446.418 346.412 Z" fill="url(#hnf-ico-24)" />
+    <path d="M 550.622 478.411 L 550.443 578.484 L 605.767 578.552 L 605.745 452.871 C 586.819 460.995 568.742 469.406 550.622 478.411" fill="url(#hnf-ico-25)" />
+    <path d="M 657.731 425.213 C 643.340 433.717 629.507 442.152 614.447 449.175 L 614.447 449.175 L 614.648 464.988 L 695.445 465.110 C 701.257 465.119 706.677 463.703 710.806 459.539 L 710.806 459.539 L 734.484 435.666 L 747.957 421.854 L 751.956 417.241 L 691.798 417.104 C 691.721 417.104 691.643 417.104 691.565 417.104 L 691.565 417.104 C 679.703 417.104 667.984 419.155 657.731 425.213" fill="url(#hnf-ico-26)" />
+    <path d="M 550.672 365.923 L 550.760 421.707 L 589.550 406.606 L 622.156 393.021 L 640.793 384.682 C 651.998 379.668 662.465 373.631 672.254 365.711 L 672.254 365.711 Z" fill="url(#hnf-ico-27)" />
+    <path d="M 614.420 517.619 L 655.219 517.321 C 658.277 517.298 660.890 515.468 663.413 513.452 L 663.413 513.452 C 675.886 503.484 687.078 493.159 698.942 481.847 L 698.942 481.847 L 614.407 481.699 Z" fill="url(#hnf-ico-28)" />
+    <path d="M 399.122 568.546 L 391.211 580.379 L 444.832 580.220 L 444.731 529.288 C 444.729 527.825 444.077 526.197 445.053 524.898 L 445.053 524.898 L 444.823 523.430 C 427.716 536.317 412.107 551.188 399.122 568.546" fill="url(#hnf-ico-29)" />
+    <path d="M 713.237 342.035 L 673.066 352.050 L 699.459 363.336 L 705.845 390.935 L 740.332 335.299 Z" fill="url(#hnf-ico-30)" />
+    <path d="M 444.731 529.288 C 445.519 527.995 445.166 526.361 445.053 524.898 L 445.053 524.898 C 444.077 526.197 444.729 527.825 444.731 529.288" fill="url(#hnf-ico-31)" />
+    <path d="M 371.801 362.656 h 15.785 v 15.785 h -15.785 Z" fill="url(#hnf-ico-32)" />
+    <path d="M 392.471 375.638 h 11.836 v 11.836 h -11.836 Z" fill="url(#hnf-ico-33)" />
+    <path d="M 356.224 382.700 h 12.462 v 12.462 h -12.462 Z" fill="url(#hnf-ico-34)" />
+    <path d="M 356.432 366.811 h 9.762 v 9.762 h -9.762 Z" fill="url(#hnf-ico-35)" />
+    <path d="M 376.216 349.935 h 9.294 v 9.294 h -9.294 Z" fill="url(#hnf-ico-36)" />
+    <path d="M 392.807 361.774 h 6.647 v 6.646 h -6.647 Z" fill="url(#hnf-ico-37)" />
+    <path d="M 363.364 357.100 h 4.777 v 4.777 h -4.777 Z" fill="url(#hnf-ico-38)" />
+    <path d="M 375.581 382.826 h 8.798 v 8.804 h -8.798 Z" fill="url(#hnf-ico-39)" />
+    <path d="M 372.672 398.030 h 5.167 v 5.167 h -5.167 Z" fill="url(#hnf-ico-40)" />
+  </g>
+</svg>

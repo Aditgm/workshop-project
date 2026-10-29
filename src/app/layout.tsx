@@ -33,6 +33,23 @@ export const metadata: Metadata = {
     description:
       "Practical commercial education, go-to-market advisory, and a community for people doing the work.",
     url: siteUrl,
+    images: [
+      {
+        url: "/brand/huntnfarm-logo-navy.png",
+        width: 1080,
+        height: 1080,
+        alt: "Hunt n Farm Logo",
+      },
+    ],
+  },
+  icons: {
+    icon: [
+      { url: "/icon.svg", type: "image/svg+xml" },
+      { url: "/brand/huntnfarm-icon-512.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: [
+      { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+    ],
   },
   robots: {
     index: true,
